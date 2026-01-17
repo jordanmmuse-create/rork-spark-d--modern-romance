@@ -1,12 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAppStore } from '@/store/appStore';
 import Colors from '@/constants/colors';
+import { shallow } from 'zustand/shallow';
 
 export default function Index() {
   const hasRoutedThisSession = useRef(false);
   const [isReady, setIsReady] = useState(false);
+  const debugState = useAppStore(
+  (state) => ({
+    _hasHydrated: state._hasHydrated,
+    hasCompletedOnboarding: state.profile?.hasCompletedOnboarding,
+    conversationsLength: state.conversations?.length ?? 0,
+    profileExists: !!state.profile,
+  }),
+  shallow
+);
 
   // Poll for hydration completion - more reliable than reactive state
   useEffect(() => {
@@ -23,7 +33,8 @@ export default function Index() {
       
       if (hydrated) {
         console.log('[Index] Hydration confirmed, setting ready');
-        setIsReady(true);
+        setIsReady((prev) => (prev ? prev : true));
+  return; // stop scheduling any more checks
       } else if (checkCount < maxChecks) {
         timeoutId = setTimeout(checkHydration, 100);
       } else {
@@ -72,10 +83,18 @@ export default function Index() {
   }, [isReady]);
 
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color={Colors.dark.tint} />
+  <View style={styles.container}>
+    <View style={styles.debug}>
+      <Text style={styles.debugTitle}>DEBUG (temporary)</Text>
+      <Text style={styles.debugText}>_hasHydrated: {String(debugState._hasHydrated)}</Text>
+      <Text style={styles.debugText}>profile exists: {String(debugState.profileExists)}</Text>
+      <Text style={styles.debugText}>hasCompletedOnboarding: {String(debugState.hasCompletedOnboarding)}</Text>
+      <Text style={styles.debugText}>conversations.length: {String(debugState.conversationsLength)}</Text>
     </View>
-  );
+
+    <ActivityIndicator size="large" color={Colors.dark.tint} />
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
@@ -85,4 +104,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#1a1a2e',
   },
+  debug: {
+  position: 'absolute',
+  top: 60,
+  left: 12,
+  right: 12,
+  padding: 10,
+  borderRadius: 10,
+  backgroundColor: 'rgba(0,0,0,0.75)',
+},
+debugTitle: {
+  color: 'white',
+  fontSize: 12,
+  fontWeight: '700',
+  marginBottom: 6,
+},
+debugText: {
+  color: 'white',
+  fontSize: 12,
+},
 });
