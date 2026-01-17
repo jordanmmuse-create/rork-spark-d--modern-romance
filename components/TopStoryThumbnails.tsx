@@ -4,15 +4,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { Play } from 'lucide-react-native';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/colors';
 import { InspoPost } from '@/types';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const THUMBNAIL_GAP = SPACING.sm;
-const THUMBNAIL_SIZE = (SCREEN_WIDTH - SPACING.lg * 2 - THUMBNAIL_GAP * 2) / 3;
 
 interface MediaThumbnailsProps {
   stories: InspoPost[];
@@ -36,12 +34,15 @@ export default function MediaThumbnails({
   stories,
   onThumbnailPress,
 }: MediaThumbnailsProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const thumbnailSize = (screenWidth - SPACING.lg * 2 - THUMBNAIL_GAP * 2) / 3;
+  
   const safeStories = Array.isArray(stories) ? stories : [];
   const mediaStories = safeStories
     .filter(isValidMediaStory)
     .slice(0, 3);
 
-  console.log('[MediaThumbnails] Rendering thumbnails:', mediaStories.length, mediaStories.map(s => ({ id: s.id, thumb: s.mediaThumbnailUrl, media: s.mediaUrl })));
+  console.log('[MediaThumbnails] Rendering thumbnails:', mediaStories.length, 'size:', thumbnailSize);
 
   if (mediaStories.length === 0) {
     return null;
@@ -55,6 +56,7 @@ export default function MediaThumbnails({
           story={story}
           index={index}
           onPress={onThumbnailPress}
+          size={thumbnailSize}
         />
       ))}
     </View>
@@ -65,9 +67,10 @@ interface ThumbnailItemProps {
   story: InspoPost;
   index: number;
   onPress: (story: InspoPost) => void;
+  size: number;
 }
 
-function ThumbnailItem({ story, index, onPress }: ThumbnailItemProps) {
+function ThumbnailItem({ story, index, onPress, size }: ThumbnailItemProps) {
   const [imageError, setImageError] = useState(false);
   
   if (!story || !story.id) {
@@ -80,7 +83,7 @@ function ThumbnailItem({ story, index, onPress }: ThumbnailItemProps) {
 
   return (
     <TouchableOpacity
-      style={styles.thumbnailWrapper}
+      style={[styles.thumbnailWrapper, { width: size, height: size }]}
       onPress={() => {
         console.log('[MediaThumbnails] Thumbnail pressed:', story.id, story.title);
         onPress(story);
@@ -127,8 +130,6 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   thumbnailWrapper: {
-    width: THUMBNAIL_SIZE,
-    height: THUMBNAIL_SIZE,
     borderRadius: BORDER_RADIUS.md,
     overflow: 'hidden',
     position: 'relative',
