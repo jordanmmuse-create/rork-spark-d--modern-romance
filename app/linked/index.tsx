@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -147,7 +148,12 @@ export default function LinkedLobby() {
   const displayName = profile?.name || 'Writer';
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={{ uri: 'https://images.pexels.com/photos/4440714/pexels-photo-4440714.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
       <Stack.Screen options={{ headerShown: false }} />
       
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -238,18 +244,20 @@ export default function LinkedLobby() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  </View>
+  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1612',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(26, 16, 10, 0.75)',
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#1a1612',
   },
   keyboardView: {
     flex: 1,

@@ -11,6 +11,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Share,
+  ImageBackground,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -235,15 +236,25 @@ export default function LinkedGame() {
 
   if (initialLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <ImageBackground
+        source={{ uri: 'https://images.pexels.com/photos/4440714/pexels-photo-4440714.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
+        style={styles.loadingContainer}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
         <ActivityIndicator size="large" color="#d4a574" />
         <Text style={styles.loadingText}>Loading story...</Text>
-      </View>
+      </ImageBackground>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={{ uri: 'https://images.pexels.com/photos/4440714/pexels-photo-4440714.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
       <Stack.Screen options={{ headerShown: false }} />
       
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -371,18 +382,20 @@ export default function LinkedGame() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  </View>
+  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1612',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(26, 16, 10, 0.75)',
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#1a1612',
   },
   customHeader: {
     flexDirection: 'row' as const,
@@ -392,9 +405,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#1a1612',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
     gap: 16,
   },
   loadingText: {
