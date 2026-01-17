@@ -1771,16 +1771,13 @@ const appStore = create<AppState>()(
               }, 150);
               
               const now = new Date();
-              const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-              const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
-              const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
-              
-              const hasCoachConversation = state.conversations?.some(
-                conv => conv.id === 'conv-coach-sarah' || conv.participantId === 'coach-sarah'
-              );
               
               if (!state.conversations || state.conversations.length === 0) {
                 console.log('[Hydration] Seeding sample conversations...');
+                
+                const jan2 = '2026-01-02T10:00:00.000Z';
+                const jan1 = '2026-01-01T14:00:00.000Z';
+                const dec31 = '2025-12-31T16:00:00.000Z';
                 
                 state.conversations = [
                   {
@@ -1792,8 +1789,20 @@ const appStore = create<AppState>()(
                     isPartner: true,
                     relationshipType: 'partner',
                     lastMessage: 'Can\'t wait to see you tonight! 💕',
-                    lastMessageAt: yesterday,
-                    unreadCount: 2,
+                    lastMessageAt: jan2,
+                    unreadCount: 0,
+                  },
+                  {
+                    id: 'conv-friend-sarah-lopez',
+                    userId: state.profile.id,
+                    participantId: 'user-sarah-lopez',
+                    participantName: 'Dr. Sarah Lopez',
+                    participantAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
+                    isPartner: false,
+                    relationshipType: 'friend',
+                    lastMessage: 'I\'d love to discuss some strategies that could help...',
+                    lastMessageAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                    unreadCount: 1,
                   },
                   {
                     id: 'conv-friend1',
@@ -1804,8 +1813,8 @@ const appStore = create<AppState>()(
                     isPartner: false,
                     relationshipType: 'friend',
                     lastMessage: 'Hey! Did you see the new coffee shop?',
-                    lastMessageAt: yesterday,
-                    unreadCount: 1,
+                    lastMessageAt: jan2,
+                    unreadCount: 0,
                   },
                   {
                     id: 'conv-friend2',
@@ -1816,7 +1825,7 @@ const appStore = create<AppState>()(
                     isPartner: false,
                     relationshipType: 'friend',
                     lastMessage: 'Thanks for the advice!',
-                    lastMessageAt: twoDaysAgo,
+                    lastMessageAt: jan1,
                     unreadCount: 0,
                   },
                   {
@@ -1828,7 +1837,7 @@ const appStore = create<AppState>()(
                     isPartner: false,
                     relationshipType: 'friend',
                     lastMessage: 'Let me know when you\'re free!',
-                    lastMessageAt: threeDaysAgo,
+                    lastMessageAt: dec31,
                     unreadCount: 0,
                   },
                   {
@@ -1839,21 +1848,9 @@ const appStore = create<AppState>()(
                     participantAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop',
                     isPartner: false,
                     relationshipType: 'community',
-                    lastMessage: 'Yo I saw your post in Singles & Thriving 👀',
+                    lastMessage: 'Yo I saw your post in Singles & Thriving...',
                     lastMessageAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
                     unreadCount: 1,
-                  },
-                  {
-                    id: 'conv-community-maya',
-                    userId: state.profile.id,
-                    participantId: 'user-community-maya',
-                    participantName: 'Maya Rivers',
-                    participantAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
-                    isPartner: false,
-                    relationshipType: 'community',
-                    lastMessage: 'You going to the Game Night space later?',
-                    lastMessageAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-                    unreadCount: 0,
                   },
                 ];
                 
@@ -1863,7 +1860,7 @@ const appStore = create<AppState>()(
                     conversationId: 'conv-partner',
                     senderId: 'user-partner',
                     content: 'Good morning! ☀️',
-                    createdAt: new Date(now.getTime() - 25 * 60 * 60 * 1000).toISOString(),
+                    createdAt: '2026-01-02T08:00:00.000Z',
                     read: true,
                   },
                   {
@@ -1871,7 +1868,7 @@ const appStore = create<AppState>()(
                     conversationId: 'conv-partner',
                     senderId: state.profile.id,
                     content: 'Morning babe! How did you sleep?',
-                    createdAt: new Date(now.getTime() - 24.5 * 60 * 60 * 1000).toISOString(),
+                    createdAt: '2026-01-02T08:30:00.000Z',
                     read: true,
                   },
                   {
@@ -1879,15 +1876,39 @@ const appStore = create<AppState>()(
                     conversationId: 'conv-partner',
                     senderId: 'user-partner',
                     content: 'So good! Excited for dinner tonight',
-                    createdAt: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-                    read: false,
+                    createdAt: '2026-01-02T09:00:00.000Z',
+                    read: true,
                   },
                   {
                     id: 'msg-4',
                     conversationId: 'conv-partner',
                     senderId: 'user-partner',
                     content: 'Can\'t wait to see you tonight! 💕',
-                    createdAt: yesterday,
+                    createdAt: jan2,
+                    read: true,
+                  },
+                  {
+                    id: 'msg-sarah-lopez-1',
+                    conversationId: 'conv-friend-sarah-lopez',
+                    senderId: 'user-sarah-lopez',
+                    content: 'Hi there! I saw your profile and thought we might connect well.',
+                    createdAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+                    read: true,
+                  },
+                  {
+                    id: 'msg-sarah-lopez-2',
+                    conversationId: 'conv-friend-sarah-lopez',
+                    senderId: state.profile.id,
+                    content: 'Hi Dr. Lopez! Thanks for reaching out.',
+                    createdAt: new Date(now.getTime() - 2.5 * 60 * 60 * 1000).toISOString(),
+                    read: true,
+                  },
+                  {
+                    id: 'msg-sarah-lopez-3',
+                    conversationId: 'conv-friend-sarah-lopez',
+                    senderId: 'user-sarah-lopez',
+                    content: 'I\'d love to discuss some strategies that could help...',
+                    createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
                     read: false,
                   },
                   {
@@ -1895,15 +1916,15 @@ const appStore = create<AppState>()(
                     conversationId: 'conv-friend1',
                     senderId: 'user-friend1',
                     content: 'Hey! Did you see the new coffee shop?',
-                    createdAt: yesterday,
-                    read: false,
+                    createdAt: jan2,
+                    read: true,
                   },
                   {
                     id: 'msg-6',
                     conversationId: 'conv-friend2',
                     senderId: state.profile.id,
                     content: 'What do you think about this?',
-                    createdAt: new Date(now.getTime() - 2.5 * 24 * 60 * 60 * 1000).toISOString(),
+                    createdAt: '2026-01-01T12:00:00.000Z',
                     read: true,
                   },
                   {
@@ -1911,7 +1932,7 @@ const appStore = create<AppState>()(
                     conversationId: 'conv-friend2',
                     senderId: 'user-friend2',
                     content: 'Thanks for the advice!',
-                    createdAt: twoDaysAgo,
+                    createdAt: jan1,
                     read: true,
                   },
                   {
@@ -1919,7 +1940,7 @@ const appStore = create<AppState>()(
                     conversationId: 'conv-friend3',
                     senderId: 'user-friend3',
                     content: 'Let me know when you\'re free!',
-                    createdAt: threeDaysAgo,
+                    createdAt: dec31,
                     read: true,
                   },
                   {
@@ -1942,104 +1963,87 @@ const appStore = create<AppState>()(
                     id: 'msg-community-kai-3',
                     conversationId: 'conv-community-kai',
                     senderId: 'user-community-kai',
-                    content: 'Yo I saw your post in Singles & Thriving 👀',
+                    content: 'Yo I saw your post in Singles & Thriving...',
                     createdAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
                     read: false,
                   },
-                  {
-                    id: 'msg-community-maya-1',
-                    conversationId: 'conv-community-maya',
-                    senderId: 'user-community-maya',
-                    content: 'Hey! We matched in the Daily Spark Chat earlier',
-                    createdAt: new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString(),
-                    read: true,
-                  },
-                  {
-                    id: 'msg-community-maya-2',
-                    conversationId: 'conv-community-maya',
-                    senderId: state.profile.id,
-                    content: 'Oh yeah! That was a fun prompt today',
-                    createdAt: new Date(now.getTime() - 7 * 60 * 60 * 1000).toISOString(),
-                    read: true,
-                  },
-                  {
-                    id: 'msg-community-maya-3',
-                    conversationId: 'conv-community-maya',
-                    senderId: 'user-community-maya',
-                    content: 'You going to the Game Night space later?',
-                    createdAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-                    read: true,
-                  },
-                  {
-                    id: 'msg-coach-1',
-                    conversationId: 'conv-coach-sarah',
-                    senderId: 'coach-sarah',
-                    content: 'Hi there! Welcome to your coaching journey. I\'m Dr. Sarah Lopez, and I\'m here to help you navigate your relationship with care and expertise.',
-                    createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-                    read: true,
-                  },
-                  {
-                    id: 'msg-coach-2',
-                    conversationId: 'conv-coach-sarah',
-                    senderId: state.profile.id,
-                    content: 'Hi Dr. Lopez! Thanks for reaching out. I\'ve been having some communication issues with my partner lately.',
-                    createdAt: new Date(now.getTime() - 2.5 * 24 * 60 * 60 * 1000).toISOString(),
-                    read: true,
-                  },
-                  {
-                    id: 'msg-coach-3',
-                    conversationId: 'conv-coach-sarah',
-                    senderId: 'coach-sarah',
-                    content: 'I\'d love to discuss some strategies for improving your communication patterns. When works for you?',
-                    createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-                    read: false,
-                  },
                 ];
-                
-                state.conversations.push({
-                  id: 'conv-coach-sarah',
-                  userId: state.profile.id,
-                  participantId: 'coach-sarah',
-                  participantName: 'Dr. Sarah Lopez',
-                  participantAvatar: 'https://i.pravatar.cc/300?img=1',
-                  isPartner: false,
-                  relationshipType: 'coach',
-                  lastMessage: 'I\'d love to discuss some strategies for improving your communication patterns. When works for you?',
-                  lastMessageAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-                  unreadCount: 1,
-                });
               } else {
-                console.log('[Hydration] Updating existing conversation avatars...');
-                state.conversations = state.conversations.map(conv => {
-                  if (conv.participantName === 'Alex' && conv.isPartner) {
-                    return { ...conv, participantAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop' };
-                  }
-                  if (conv.participantName === 'Sarah') {
-                    return { ...conv, participantAvatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop' };
-                  }
-                  if (conv.participantName === 'Mike') {
-                    return { ...conv, participantAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' };
-                  }
-                  if (conv.participantName === 'Emma') {
-                    return { ...conv, participantAvatar: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=400&fit=crop' };
-                  }
-                  return conv;
-                });
+                console.log('[Hydration] Conversations exist, checking for missing seeded data...');
                 
-                const hasCommunityKai = state.conversations.some(
-                  conv => conv.id === 'conv-community-kai'
-                );
-                const hasCommunityMaya = state.conversations.some(
-                  conv => conv.id === 'conv-community-maya'
-                );
+                const hasPartner = state.conversations.some(c => c.isPartner || c.relationshipType === 'partner');
+                const hasFriends = state.conversations.some(c => c.relationshipType === 'friend');
+                const hasCommunity = state.conversations.some(c => c.relationshipType === 'community');
                 
-                if (!hasCommunityKai || !hasCommunityMaya) {
-                  console.log('[Hydration] Adding missing community conversations...');
-                  const communityConvos: Conversation[] = [];
-                  const communityMsgs: Message[] = [];
+                if (!hasPartner || !hasFriends || !hasCommunity) {
+                  console.log('[Hydration] Missing conversation categories, re-seeding all...');
                   
-                  if (!hasCommunityKai) {
-                    communityConvos.push({
+                  const jan2 = '2026-01-02T10:00:00.000Z';
+                  const jan1 = '2026-01-01T14:00:00.000Z';
+                  const dec31 = '2025-12-31T16:00:00.000Z';
+                  
+                  state.conversations = [
+                    {
+                      id: 'conv-partner',
+                      userId: state.profile.id,
+                      participantId: 'user-partner',
+                      participantName: 'Alex',
+                      participantAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+                      isPartner: true,
+                      relationshipType: 'partner',
+                      lastMessage: 'Can\'t wait to see you tonight! 💕',
+                      lastMessageAt: jan2,
+                      unreadCount: 0,
+                    },
+                    {
+                      id: 'conv-friend-sarah-lopez',
+                      userId: state.profile.id,
+                      participantId: 'user-sarah-lopez',
+                      participantName: 'Dr. Sarah Lopez',
+                      participantAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
+                      isPartner: false,
+                      relationshipType: 'friend',
+                      lastMessage: 'I\'d love to discuss some strategies that could help...',
+                      lastMessageAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                      unreadCount: 1,
+                    },
+                    {
+                      id: 'conv-friend1',
+                      userId: state.profile.id,
+                      participantId: 'user-friend1',
+                      participantName: 'Sarah',
+                      participantAvatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop',
+                      isPartner: false,
+                      relationshipType: 'friend',
+                      lastMessage: 'Hey! Did you see the new coffee shop?',
+                      lastMessageAt: jan2,
+                      unreadCount: 0,
+                    },
+                    {
+                      id: 'conv-friend2',
+                      userId: state.profile.id,
+                      participantId: 'user-friend2',
+                      participantName: 'Mike',
+                      participantAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+                      isPartner: false,
+                      relationshipType: 'friend',
+                      lastMessage: 'Thanks for the advice!',
+                      lastMessageAt: jan1,
+                      unreadCount: 0,
+                    },
+                    {
+                      id: 'conv-friend3',
+                      userId: state.profile.id,
+                      participantId: 'user-friend3',
+                      participantName: 'Emma',
+                      participantAvatar: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=400&fit=crop',
+                      isPartner: false,
+                      relationshipType: 'friend',
+                      lastMessage: 'Let me know when you\'re free!',
+                      lastMessageAt: dec31,
+                      unreadCount: 0,
+                    },
+                    {
                       id: 'conv-community-kai',
                       userId: state.profile.id,
                       participantId: 'user-community-kai',
@@ -2047,127 +2051,126 @@ const appStore = create<AppState>()(
                       participantAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop',
                       isPartner: false,
                       relationshipType: 'community',
-                      lastMessage: 'Yo I saw your post in Singles & Thriving 👀',
+                      lastMessage: 'Yo I saw your post in Singles & Thriving...',
                       lastMessageAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
                       unreadCount: 1,
-                    });
-                    communityMsgs.push(
-                      {
-                        id: 'msg-community-kai-1',
-                        conversationId: 'conv-community-kai',
-                        senderId: 'user-community-kai',
-                        content: 'Hey! Just saw you in the Singles & Thriving room',
-                        createdAt: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
-                        read: true,
-                      },
-                      {
-                        id: 'msg-community-kai-2',
-                        conversationId: 'conv-community-kai',
-                        senderId: state.profile.id,
-                        content: "Oh hey! Yeah I've been hanging out there lately",
-                        createdAt: new Date(now.getTime() - 4.5 * 60 * 60 * 1000).toISOString(),
-                        read: true,
-                      },
-                      {
-                        id: 'msg-community-kai-3',
-                        conversationId: 'conv-community-kai',
-                        senderId: 'user-community-kai',
-                        content: 'Yo I saw your post in Singles & Thriving 👀',
-                        createdAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
-                        read: false,
-                      }
-                    );
-                  }
+                    },
+                  ];
                   
-                  if (!hasCommunityMaya) {
-                    communityConvos.push({
-                      id: 'conv-community-maya',
-                      userId: state.profile.id,
-                      participantId: 'user-community-maya',
-                      participantName: 'Maya Rivers',
-                      participantAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
-                      isPartner: false,
-                      relationshipType: 'community',
-                      lastMessage: 'You going to the Game Night space later?',
-                      lastMessageAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-                      unreadCount: 0,
-                    });
-                    communityMsgs.push(
-                      {
-                        id: 'msg-community-maya-1',
-                        conversationId: 'conv-community-maya',
-                        senderId: 'user-community-maya',
-                        content: 'Hey! We matched in the Daily Spark Chat earlier',
-                        createdAt: new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString(),
-                        read: true,
-                      },
-                      {
-                        id: 'msg-community-maya-2',
-                        conversationId: 'conv-community-maya',
-                        senderId: state.profile.id,
-                        content: 'Oh yeah! That was a fun prompt today',
-                        createdAt: new Date(now.getTime() - 7 * 60 * 60 * 1000).toISOString(),
-                        read: true,
-                      },
-                      {
-                        id: 'msg-community-maya-3',
-                        conversationId: 'conv-community-maya',
-                        senderId: 'user-community-maya',
-                        content: 'You going to the Game Night space later?',
-                        createdAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-                        read: true,
-                      }
-                    );
-                  }
-                  
-                  state.conversations = [...state.conversations, ...communityConvos];
-                  state.messages = [...(state.messages || []), ...communityMsgs];
-                  console.log('[Hydration] Added community conversations:', communityConvos.length);
-                }
-                
-                if (!hasCoachConversation) {
-                  console.log('[Hydration] Adding missing coach conversation...');
-                  const coachConv = {
-                    id: 'conv-coach-sarah',
-                    userId: state.profile.id,
-                    participantId: 'coach-sarah',
-                    participantName: 'Dr. Sarah Lopez',
-                    participantAvatar: 'https://i.pravatar.cc/300?img=1',
-                    isPartner: false,
-                    relationshipType: 'coach' as const,
-                    lastMessage: "I'd love to discuss some strategies for improving your communication patterns. When works for you?",
-                    lastMessageAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-                    unreadCount: 1,
-                  };
-                  state.conversations = [...state.conversations, coachConv];
-                  
-                  const coachMessages = [
+                  state.messages = [
                     {
-                      id: 'msg-coach-1',
-                      conversationId: 'conv-coach-sarah',
-                      senderId: 'coach-sarah',
-                      content: "Hi there! Welcome to your coaching journey. I'm Dr. Sarah Lopez, and I'm here to help you navigate your relationship with care and expertise.",
-                      createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+                      id: 'msg-1',
+                      conversationId: 'conv-partner',
+                      senderId: 'user-partner',
+                      content: 'Good morning! ☀️',
+                      createdAt: '2026-01-02T08:00:00.000Z',
                       read: true,
                     },
                     {
-                      id: 'msg-coach-2',
-                      conversationId: 'conv-coach-sarah',
+                      id: 'msg-2',
+                      conversationId: 'conv-partner',
                       senderId: state.profile.id,
-                      content: "Hi Dr. Lopez! Thanks for reaching out. I've been having some communication issues with my partner lately.",
-                      createdAt: new Date(now.getTime() - 2.5 * 24 * 60 * 60 * 1000).toISOString(),
+                      content: 'Morning babe! How did you sleep?',
+                      createdAt: '2026-01-02T08:30:00.000Z',
                       read: true,
                     },
                     {
-                      id: 'msg-coach-3',
-                      conversationId: 'conv-coach-sarah',
-                      senderId: 'coach-sarah',
-                      content: "I'd love to discuss some strategies for improving your communication patterns. When works for you?",
+                      id: 'msg-3',
+                      conversationId: 'conv-partner',
+                      senderId: 'user-partner',
+                      content: 'So good! Excited for dinner tonight',
+                      createdAt: '2026-01-02T09:00:00.000Z',
+                      read: true,
+                    },
+                    {
+                      id: 'msg-4',
+                      conversationId: 'conv-partner',
+                      senderId: 'user-partner',
+                      content: 'Can\'t wait to see you tonight! 💕',
+                      createdAt: jan2,
+                      read: true,
+                    },
+                    {
+                      id: 'msg-sarah-lopez-1',
+                      conversationId: 'conv-friend-sarah-lopez',
+                      senderId: 'user-sarah-lopez',
+                      content: 'Hi there! I saw your profile and thought we might connect well.',
+                      createdAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+                      read: true,
+                    },
+                    {
+                      id: 'msg-sarah-lopez-2',
+                      conversationId: 'conv-friend-sarah-lopez',
+                      senderId: state.profile.id,
+                      content: 'Hi Dr. Lopez! Thanks for reaching out.',
+                      createdAt: new Date(now.getTime() - 2.5 * 60 * 60 * 1000).toISOString(),
+                      read: true,
+                    },
+                    {
+                      id: 'msg-sarah-lopez-3',
+                      conversationId: 'conv-friend-sarah-lopez',
+                      senderId: 'user-sarah-lopez',
+                      content: 'I\'d love to discuss some strategies that could help...',
                       createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
                       read: false,
                     },
+                    {
+                      id: 'msg-5',
+                      conversationId: 'conv-friend1',
+                      senderId: 'user-friend1',
+                      content: 'Hey! Did you see the new coffee shop?',
+                      createdAt: jan2,
+                      read: true,
+                    },
+                    {
+                      id: 'msg-6',
+                      conversationId: 'conv-friend2',
+                      senderId: state.profile.id,
+                      content: 'What do you think about this?',
+                      createdAt: '2026-01-01T12:00:00.000Z',
+                      read: true,
+                    },
+                    {
+                      id: 'msg-7',
+                      conversationId: 'conv-friend2',
+                      senderId: 'user-friend2',
+                      content: 'Thanks for the advice!',
+                      createdAt: jan1,
+                      read: true,
+                    },
+                    {
+                      id: 'msg-8',
+                      conversationId: 'conv-friend3',
+                      senderId: 'user-friend3',
+                      content: 'Let me know when you\'re free!',
+                      createdAt: dec31,
+                      read: true,
+                    },
+                    {
+                      id: 'msg-community-kai-1',
+                      conversationId: 'conv-community-kai',
+                      senderId: 'user-community-kai',
+                      content: 'Hey! Just saw you in the Singles & Thriving room',
+                      createdAt: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+                      read: true,
+                    },
+                    {
+                      id: 'msg-community-kai-2',
+                      conversationId: 'conv-community-kai',
+                      senderId: state.profile.id,
+                      content: 'Oh hey! Yeah I\'ve been hanging out there lately',
+                      createdAt: new Date(now.getTime() - 4.5 * 60 * 60 * 1000).toISOString(),
+                      read: true,
+                    },
+                    {
+                      id: 'msg-community-kai-3',
+                      conversationId: 'conv-community-kai',
+                      senderId: 'user-community-kai',
+                      content: 'Yo I saw your post in Singles & Thriving...',
+                      createdAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
+                      read: false,
+                    },
                   ];
-                  state.messages = [...(state.messages || []), ...coachMessages];
                 }
               }
               
