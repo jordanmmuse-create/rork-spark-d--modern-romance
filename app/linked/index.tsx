@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link2, UserPlus, ArrowLeft, Sparkles } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
@@ -31,7 +31,6 @@ function generateUserId() {
 
 export default function LinkedLobby() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const profile = useAppStore((state) => state.profile);
   
   const [code, setCode] = useState('');
@@ -149,24 +148,17 @@ export default function LinkedLobby() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: '',
-          headerTransparent: true,
-          headerLeft: () => (
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <KeyboardAvoidingView
+          style={styles.keyboardView}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={styles.content}>
             <Pressable onPress={() => router.back()} style={styles.backButton}>
               <ArrowLeft size={24} color="#fffbeb" />
             </Pressable>
-          ),
-        }}
-      />
-      
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={[styles.content, { paddingTop: insets.top + 60 }]}>
           <View style={styles.header}>
             <View style={styles.iconContainer}>
               <Link2 size={40} color="#d4a574" />
@@ -245,12 +237,17 @@ export default function LinkedLobby() {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
+  </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#1a1612',
+  },
+  safeArea: {
     flex: 1,
     backgroundColor: '#1a1612',
   },
@@ -263,6 +260,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 8,
+    alignSelf: 'flex-start' as const,
+    marginBottom: 8,
   },
   header: {
     alignItems: 'center',

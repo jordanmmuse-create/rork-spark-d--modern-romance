@@ -13,7 +13,7 @@ import {
   Share,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Link2, Send, RefreshCw, Copy, Users } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import * as Clipboard from 'expo-clipboard';
@@ -26,7 +26,6 @@ const LINKED_USER_ID_KEY = 'linked_user_id';
 export default function LinkedGame() {
   const { storyId } = useLocalSearchParams<{ storyId: string }>();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const profile = useAppStore((state) => state.profile);
 
   const [userId, setUserId] = useState<string | null>(null);
@@ -245,31 +244,24 @@ export default function LinkedGame() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: '',
-          headerTransparent: true,
-          headerLeft: () => (
-            <Pressable onPress={() => router.back()} style={styles.backButton}>
-              <ArrowLeft size={24} color="#fffbeb" />
-            </Pressable>
-          ),
-          headerRight: () => (
-            <Pressable onPress={copyInviteCode} style={styles.codeButton}>
-              <Copy size={18} color="#d4a574" />
-              <Text style={styles.codeButtonText}>{story?.invite_code}</Text>
-            </Pressable>
-          ),
-        }}
-      />
-
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        <View style={[styles.content, { paddingTop: insets.top + 56 }]}>
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <KeyboardAvoidingView
+          style={styles.keyboardView}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
+        >
+          <View style={styles.content}>
+            <View style={styles.customHeader}>
+              <Pressable onPress={() => router.back()} style={styles.backButton}>
+                <ArrowLeft size={24} color="#fffbeb" />
+              </Pressable>
+              <Pressable onPress={copyInviteCode} style={styles.codeButton}>
+                <Copy size={18} color="#d4a574" />
+                <Text style={styles.codeButtonText}>{story?.invite_code}</Text>
+              </Pressable>
+            </View>
           <View style={styles.header}>
             <Link2 size={28} color="#d4a574" />
             <Text style={styles.title}>L{"'"}Inked</Text>
@@ -378,7 +370,8 @@ export default function LinkedGame() {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
+  </View>
   );
 }
 
@@ -386,6 +379,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1612',
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1a1612',
+  },
+  customHeader: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    marginBottom: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -430,7 +433,7 @@ const styles = StyleSheet.create({
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
     gap: 10,
-    marginTop: 8,
+    marginTop: 4,
   },
   title: {
     fontSize: 28,
