@@ -52,10 +52,6 @@ export default function LinkedLobby() {
 
   const createStory = async () => {
     if (!userId) return;
-    if (!supabase) {
-      Alert.alert('Not Configured', 'Supabase is not configured. Please set up your environment variables.');
-      return;
-    }
     
     setLoading(true);
     if (Platform.OS !== 'web') {
@@ -99,10 +95,6 @@ export default function LinkedLobby() {
 
   const joinStory = async () => {
     if (!userId) return;
-    if (!supabase) {
-      Alert.alert('Not Configured', 'Supabase is not configured. Please set up your environment variables.');
-      return;
-    }
     
     const clean = code.trim().toUpperCase();
     if (!clean) {

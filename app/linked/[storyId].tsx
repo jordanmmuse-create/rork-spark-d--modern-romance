@@ -51,7 +51,7 @@ export default function LinkedGame() {
   }, []);
 
   const load = useCallback(async () => {
-    if (!storyId || !supabase) return;
+    if (!storyId) return;
     
     try {
       console.log('[L\'Inked Game] Loading story:', storyId);
@@ -84,7 +84,7 @@ export default function LinkedGame() {
   }, [storyId]);
 
   useEffect(() => {
-    if (!userId || !storyId || !supabase) return;
+    if (!userId || !storyId) return;
 
     load();
 
@@ -113,13 +113,13 @@ export default function LinkedGame() {
 
     return () => {
       console.log('[L\'Inked Game] Cleaning up subscription');
-      supabase?.removeChannel(channel);
+      supabase.removeChannel(channel);
     };
   }, [userId, storyId, load]);
 
   const submit = async () => {
     const trimmed = text.trim();
-    if (!trimmed || !story || !userId || !supabase) return;
+    if (!trimmed || !story || !userId) return;
 
     if (!isMyTurn) {
       Alert.alert('Not your turn', 'Wait for your partner to write their sentence.');
@@ -169,7 +169,7 @@ export default function LinkedGame() {
   };
 
   const startNew = async () => {
-    if (!story || !supabase) return;
+    if (!story) return;
 
     Alert.alert(
       'Start a new story?',
@@ -180,7 +180,6 @@ export default function LinkedGame() {
           text: 'Start Fresh',
           style: 'destructive',
           onPress: async () => {
-            if (!supabase) return;
             try {
               console.log('[L\'Inked Game] Starting new story');
               
