@@ -4,21 +4,27 @@ import { Mail } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAppStore } from '@/store/appStore';
 
+type UnreadScope = 'guidance' | 'chats' | 'conversations';
+
 interface UnreadMailIconProps {
   onPress: () => void;
   onDoubleTap?: () => void;
   size?: number;
   dynamicColor?: boolean;
   color?: string;
+  scope?: UnreadScope;
 }
 
 const DOUBLE_TAP_DELAY = 300;
 
-export default function UnreadMailIcon({ onPress, onDoubleTap, size = 24, dynamicColor = false, color }: UnreadMailIconProps) {
+export default function UnreadMailIcon({ onPress, onDoubleTap, size = 24, dynamicColor = false, color, scope }: UnreadMailIconProps) {
   const lastTapRef = useRef<number>(0);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const unreadCount = useAppStore((state) => {
+    if (scope) {
+      return state.getUnreadCountByScope(scope);
+    }
     return state.conversations.reduce((total, conv) => total + conv.unreadCount, 0);
   });
 

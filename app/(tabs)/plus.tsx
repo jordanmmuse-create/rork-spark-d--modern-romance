@@ -38,7 +38,7 @@ export default function PlusScreen() {
   const router = useRouter();
   const { colors } = useThemeStyles();
   const { getJourneys, userJourneys, startJourney, addCalendarEvent, calendarEvents, toggleEventComplete, deleteCalendarEvent, scheduleCoachingSession, syncProfileDatesToCalendar, profile, checkIns } = useAppStore();
-  const unreadMessagesCount = useAppStore((state) => state.conversations.reduce((total, conv) => total + conv.unreadCount, 0));
+  const unreadMessagesCount = useAppStore((state) => state.getUnreadCountByScope('chats'));
   const isNavigatingToMessagesRef = useRef<boolean>(false);
   const journeys = getJourneys();
   const scrollRef = useRef<ScrollView>(null);

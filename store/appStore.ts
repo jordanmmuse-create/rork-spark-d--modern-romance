@@ -154,6 +154,7 @@ interface AppState {
   
   getConversations: () => Conversation[];
   getUnreadMessagesCount: () => number;
+  getUnreadCountByScope: (scope: 'guidance' | 'chats' | 'conversations') => number;
   getMessagesForConversation: (conversationId: string) => Message[];
   markConversationAsRead: (conversationId: string) => void;
   getOrCreateConversation: (conversationId: string, participantName: string, participantAvatar?: string, isPartner?: boolean) => Conversation;
@@ -1200,6 +1201,23 @@ const appStore = create<AppState>()(
       getUnreadMessagesCount: () => {
         const { conversations } = get();
         return conversations.reduce((total, conv) => total + conv.unreadCount, 0);
+      },
+      
+      getUnreadCountByScope: (scope: 'guidance' | 'chats' | 'conversations') => {
+        const { conversations } = get();
+        
+        const scopeFilters = {
+          guidance: ['partner', 'coach', 'intell'],
+          chats: ['partner', 'friend', 'community'],
+          conversations: ['partner', 'coach', 'intell', 'friend', 'community'],
+        };
+        
+        const allowedTypes = scopeFilters[scope];
+        
+        return conversations.filter(conv => {
+          const relType = conv.relationshipType || (conv.isPartner ? 'partner' : 'friend');
+          return allowedTypes.includes(relType) && conv.unreadCount > 0;
+        }).reduce((total, conv) => total + conv.unreadCount, 0);
       },
       
       getMessagesForConversation: (conversationId: string) => {
