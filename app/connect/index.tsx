@@ -265,11 +265,11 @@ export default function ConnectHubScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useThemeStyles();
-  const { getUnreadCountByScope } = useAppStore();
+  const { getUnreadMessagesCount } = useAppStore();
 
   const [selectedTab, setSelectedTab] = useState<ConnectCategory>('Connect');
   
-  const unreadCount = getUnreadCountByScope('chats');
+  const unreadCount = getUnreadMessagesCount();
 
   const rooms = useMemo(() => CHAT_CATEGORIES[selectedTab], [selectedTab]);
 

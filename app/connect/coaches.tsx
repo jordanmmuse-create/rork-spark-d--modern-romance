@@ -115,7 +115,6 @@ export default function CoachesScreen() {
               console.log('[Coaches] Messages pressed');
               router.push('/connect/guidance-messages' as any);
             }}
-            scope="guidance"
           />
         </View>
       </View>

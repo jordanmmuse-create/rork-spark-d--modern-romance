@@ -53,7 +53,7 @@ export default function StatusScreen() {
 
   const handleSelect = (status: RelationshipStatus) => {
     updateOnboarding({ status, step: 1 });
-    router.push('/onboarding/focus-areas' as any);
+    router.push('/onboarding/focus-areas');
   };
 
   return (

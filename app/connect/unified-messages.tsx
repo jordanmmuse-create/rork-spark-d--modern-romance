@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   Platform,
   TextInput,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,7 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { Search, ChevronLeft, PenLine, Mail } from 'lucide-react-native';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/colors';
-
+import { SEED_COACHES } from '@/constants/plus-data';
 import { useAppStore } from '@/store/appStore';
 import ConversationRow from '@/components/ConversationRow';
 import type { Conversation } from '@/types';
@@ -36,21 +35,9 @@ export default function UnifiedMessagesScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useThemeStyles();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
-  const hasHydrated = useAppStore((state) => state._hasHydrated);
-  const ensureSeededConversations = useAppStore((state) => state.ensureSeededConversations);
-  const isSeedingConversations = useAppStore((state) => state._isSeedingConversations);
   const storeConversations = useAppStore((state) => state.conversations);
-  
-  useEffect(() => {
-    if (!hasHydrated) {
-      console.log('[UnifiedMessages] Waiting for hydration...');
-      return;
-    }
-    console.log('[UnifiedMessages] Hydrated, ensuring seeded conversations...');
-    ensureSeededConversations();
-  }, [hasHydrated, ensureSeededConversations]);
 
+  const seededCoach = SEED_COACHES[0];
   const allConversations = useMemo(() => {
     return [...storeConversations].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
@@ -75,16 +62,6 @@ export default function UnifiedMessagesScreen() {
           unreadCount: conv.unreadCount,
           type: 'partner',
         });
-      } else if (conv.relationshipType === 'coach') {
-        unified.push({
-          id: `coach-${conv.id}`,
-          participantName: conv.participantName,
-          participantAvatar: conv.participantAvatar || '',
-          lastMessage: conv.lastMessage || '',
-          lastMessageAt: conv.lastMessageAt || new Date().toISOString(),
-          unreadCount: conv.unreadCount,
-          type: 'coach',
-        });
       } else if (conv.relationshipType === 'community') {
         unified.push({
           id: `community-${conv.id}`,
@@ -95,7 +72,7 @@ export default function UnifiedMessagesScreen() {
           unreadCount: conv.unreadCount,
           type: 'community',
         });
-      } else {
+      } else if (conv.relationshipType !== 'coach' && !conv.id.includes('coach') && !conv.participantId?.includes('coach')) {
         unified.push({
           id: `friend-${conv.id}`,
           participantName: conv.participantName,
@@ -106,6 +83,16 @@ export default function UnifiedMessagesScreen() {
           type: 'friend',
         });
       }
+    });
+
+    unified.push({
+      id: 'coach-sarah',
+      participantName: seededCoach.name,
+      participantAvatar: seededCoach.photoUrl,
+      lastMessage: "I'd love to discuss some strategies for improving your communication patterns. When works for you?",
+      lastMessageAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      unreadCount: 1,
+      type: 'coach',
     });
 
     unified.push({
@@ -126,7 +113,7 @@ export default function UnifiedMessagesScreen() {
     });
 
     return unified;
-  }, [allConversations]);
+  }, [allConversations, seededCoach]);
 
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) return unifiedConversations;
@@ -154,11 +141,7 @@ export default function UnifiedMessagesScreen() {
   );
 
   const friendConversations = useMemo(() => 
-    filteredConversations.filter(conv => 
-      conv.type === 'friend' && 
-      !conv.id.includes('sarah-lopez') &&
-      conv.participantName !== 'Dr. Sarah Lopez'
-    ),
+    filteredConversations.filter(conv => conv.type === 'friend'),
     [filteredConversations]
   );
 
@@ -198,17 +181,12 @@ export default function UnifiedMessagesScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     const realConvId = item.id.replace(/^(partner-|friend-|coach-|intell-|community-)/, '');
-    router.push(`/connect/chat/${realConvId}` as any);
+    if (item.type === 'coach') {
+      router.push(`/connect/chat/conv-coach-sarah` as any);
+    } else {
+      router.push(`/connect/chat/${realConvId}` as any);
+    }
   };
-
-  if (!hasHydrated || isSeedingConversations) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={colors.accent} />
-        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading conversations...</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -315,7 +293,7 @@ export default function UnifiedMessagesScreen() {
 
           {intellConversations.length > 0 && (
             <View style={styles.categorySection}>
-              <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>INTELL AI</Text>
+              <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>inTELL AI</Text>
               <View style={styles.categoryContent}>
                 {intellConversations.map((conv) => (
                   <View key={conv.id}>
@@ -465,10 +443,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: TYPOGRAPHY.sizes.md,
-  },
-  loadingText: {
-    fontSize: TYPOGRAPHY.sizes.md,
-    marginTop: SPACING.md,
   },
   conversationsContainer: {
     paddingHorizontal: SPACING.lg,

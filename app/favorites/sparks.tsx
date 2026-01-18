@@ -172,7 +172,7 @@ function SparkCard({ spark }: SparkCardProps) {
   const areaTagColors = getThemeTagColor(FOCUS_AREA_INFO[spark.focusArea].title);
 
   const handlePress = () => {
-    router.push(`/spark/${spark.id}` as any);
+    router.push(`/spark/${spark.id}`);
   };
 
   const handleFavorite = () => {

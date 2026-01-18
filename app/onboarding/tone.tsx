@@ -68,7 +68,7 @@ export default function ToneScreen() {
       onboardingData.partnerBirthday,
       onboardingData.anniversary
     );
-    router.replace('/(tabs)/library' as any);
+    router.replace('/(tabs)/library');
   };
 
   return (
