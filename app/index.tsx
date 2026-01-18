@@ -1,36 +1,37 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { router } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAppStore } from '@/store/appStore';
 import Colors from '@/constants/colors';
 
 export default function Index() {
-  const hasNavigated = useRef(false);
-
-  // Read the two values directly from the store (reactive)
-  const hasHydrated = useAppStore((s) => s._hasHydrated === true);
-  const hasCompletedOnboarding = useAppStore(
-    (s) => s.profile?.hasCompletedOnboarding === true
-  );
+  const hasCompletedOnboarding = useAppStore((state) => state.profile?.hasCompletedOnboarding);
+  const hasHydrated = useAppStore((state) => state._hasHydrated);
 
   useEffect(() => {
-    if (hasNavigated.current) return;
+    console.log('Index mounted, hasHydrated:', hasHydrated, 'hasCompletedOnboarding:', hasCompletedOnboarding);
+    
+    if (!hasHydrated) {
+      const timeout = setTimeout(() => {
+        console.log('Hydration timeout - proceeding anyway');
+        if (!hasCompletedOnboarding) {
+          router.replace('/onboarding');
+        } else {
+          router.replace('/(tabs)/library');
+        }
+      }, 1500);
+      return () => clearTimeout(timeout);
+    }
 
-    // Wait until hydration finishes (this prevents “undefined → false → onboarding”)
-    if (!hasHydrated) return;
-
-    hasNavigated.current = true;
-
-    // Small delay to allow state to settle
-    const t = setTimeout(() => {
-      if (hasCompletedOnboarding) {
-        router.replace('/(tabs)/library');
-      } else {
+    const timer = setTimeout(() => {
+      if (!hasCompletedOnboarding) {
         router.replace('/onboarding');
+      } else {
+        router.replace('/(tabs)/library');
       }
     }, 100);
 
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [hasHydrated, hasCompletedOnboarding]);
 
   return (
@@ -45,6 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.dark.background ?? '#1a1a2e',
+    backgroundColor: Colors.dark.background,
   },
 });
+
