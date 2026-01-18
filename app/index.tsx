@@ -15,9 +15,9 @@ export default function Index() {
       const timeout = setTimeout(() => {
         console.log('Hydration timeout - proceeding anyway');
         if (!hasCompletedOnboarding) {
-          router.replace('/onboarding');
+          router.replace('/onboarding' as any);
         } else {
-          router.replace('/(tabs)/library');
+          router.replace('/(tabs)/library' as any);
         }
       }, 1500);
       return () => clearTimeout(timeout);
@@ -25,9 +25,9 @@ export default function Index() {
 
     const timer = setTimeout(() => {
       if (!hasCompletedOnboarding) {
-        router.replace('/onboarding');
+        router.replace('/onboarding' as any);
       } else {
-        router.replace('/(tabs)/library');
+        router.replace('/(tabs)/library' as any);
       }
     }, 100);
 

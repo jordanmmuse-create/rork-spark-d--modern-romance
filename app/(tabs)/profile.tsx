@@ -105,7 +105,7 @@ export default function VaultScreen() {
             {journalEntries.length > 0 ? (
               <TouchableOpacity
                 style={[styles.journalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                onPress={() => router.push('/profile/journal')}
+                onPress={() => router.push('/profile/journal' as any)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.journalEmoji}>✍️</Text>
@@ -116,7 +116,7 @@ export default function VaultScreen() {
             ) : (
               <TouchableOpacity
                 style={[styles.journalCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                onPress={() => router.push('/profile/journal')}
+                onPress={() => router.push('/profile/journal' as any)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.journalEmoji}>✍️</Text>
@@ -126,7 +126,7 @@ export default function VaultScreen() {
             
             <TouchableOpacity
               style={[styles.addJournalButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              onPress={() => router.push('/profile/journal')}
+              onPress={() => router.push('/profile/journal' as any)}
               activeOpacity={0.8}
             >
               <Text style={[styles.addJournalButtonText, { color: colors.text }]}>Let&apos;s Write!</Text>
@@ -203,7 +203,7 @@ export default function VaultScreen() {
                 const todayCheckIn = checkIns.find(c => c.createdAt.split('T')[0] === today);
                 const hasCheckedInToday = !!todayCheckIn;
                 if (hasCheckedInToday) {
-                  router.push('/profile/checkin');
+                  router.push('/profile/checkin' as any);
                 }
               }}
               activeOpacity={0.8}
@@ -246,7 +246,7 @@ export default function VaultScreen() {
                       style={[styles.checkInButton, { backgroundColor: colors.tint }]}
                       onPress={(e) => {
                         e.stopPropagation();
-                        router.push('/profile/checkin');
+                        router.push('/profile/checkin' as any);
                       }}
                       activeOpacity={0.8}
                     >
@@ -265,7 +265,7 @@ export default function VaultScreen() {
                 return (
                   <TouchableOpacity
                     style={[styles.horoscopeSnapshotCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                    onPress={() => router.push('/profile/horoscope')}
+                    onPress={() => router.push('/profile/horoscope' as any)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.horoscopeSnapshotContent}>
@@ -323,11 +323,11 @@ export default function VaultScreen() {
 
                 const handleCategoryPress = () => {
                   if (category.id === 'saved-sparks') {
-                    router.push('/sparks/saved');
+                    router.push('/sparks/saved' as any);
                   } else if (category.id === 'shared-memories') {
                     router.push('/profile/shared-memories' as any);
                   } else if (category.id === 'my-journal') {
-                    router.push('/profile/my-journal');
+                    router.push('/profile/my-journal' as any);
                   } else if (category.id === 'milestones') {
                     router.push('/profile/milestones' as any);
                   } else if (category.id === 'favorites') {

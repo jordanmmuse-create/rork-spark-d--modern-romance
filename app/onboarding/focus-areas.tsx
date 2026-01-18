@@ -34,7 +34,7 @@ export default function FocusAreasScreen() {
 
   const handleContinue = () => {
     updateOnboarding({ focusAreas: selectedAreas, step: 2 });
-    router.push('/onboarding/goals');
+    router.push('/onboarding/goals' as any);
   };
 
   return (

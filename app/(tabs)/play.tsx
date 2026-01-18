@@ -270,7 +270,7 @@ function GameCard({ game, colors }: { game: Game; colors: any }) {
       if (Platform.OS !== 'web') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
-      router.push('/linked');
+      router.push('/linked' as any);
     }
   };
 

@@ -79,7 +79,7 @@ export default function CheckInScreen() {
   };
 
   const handleViewHoroscope = () => {
-    router.push('/profile/horoscope');
+    router.push('/profile/horoscope' as any);
   };
 
   const astrologyEnabled = profile?.astrologyEnabled ?? false;

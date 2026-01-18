@@ -208,7 +208,7 @@ export default function GoalsScreen() {
   const handleContinue = () => {
     const goals = selectedSubTopics.map((st) => st.id);
     updateOnboarding({ goals, step: 3 });
-    router.push('/onboarding/profile-details');
+    router.push('/onboarding/profile-details' as any);
   };
 
   return (
@@ -249,7 +249,7 @@ export default function GoalsScreen() {
 
             <TouchableOpacity
               testID="onboarding-goals-later"
-              onPress={() => router.push('/onboarding/profile-details')}
+              onPress={() => router.push('/onboarding/profile-details' as any)}
               style={styles.headerRight}
               activeOpacity={0.7}
             >

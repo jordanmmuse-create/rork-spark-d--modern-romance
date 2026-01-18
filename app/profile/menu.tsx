@@ -30,7 +30,7 @@ export default function ProfileMenuScreen() {
       const confirmed = window.confirm('Are you sure you want to reset and start over? This will clear all your data.');
       if (confirmed) {
         reset();
-        router.replace('/onboarding');
+        router.replace('/onboarding' as any);
       }
     } else {
       Alert.alert(
@@ -43,7 +43,7 @@ export default function ProfileMenuScreen() {
             style: 'destructive',
             onPress: () => {
               reset();
-              router.replace('/onboarding');
+              router.replace('/onboarding' as any);
             },
           },
         ]

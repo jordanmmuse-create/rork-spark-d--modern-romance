@@ -94,7 +94,7 @@ export default function WelcomeScreen() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/onboarding/status')}
+            onPress={() => router.push('/onboarding/status' as any)}
             activeOpacity={0.8}
           >
             <LinearGradient

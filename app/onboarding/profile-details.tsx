@@ -75,7 +75,7 @@ export default function ProfileDetailsScreen() {
       partnerBirthday?.toISOString(),
       anniversary?.toISOString()
     );
-    router.replace('/(tabs)/library');
+    router.replace('/(tabs)/library' as any);
   };
 
   const formatDate = (date: Date | undefined): string => {
