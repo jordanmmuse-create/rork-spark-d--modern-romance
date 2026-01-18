@@ -1793,6 +1793,18 @@ const appStore = create<AppState>()(
                     unreadCount: 0,
                   },
                   {
+                    id: 'conv-coach-sarah',
+                    userId: state.profile.id,
+                    participantId: 'coach-sarah',
+                    participantName: 'Dr. Sarah Lopez',
+                    participantAvatar: 'https://i.pravatar.cc/300?img=1',
+                    isPartner: false,
+                    relationshipType: 'coach',
+                    lastMessage: 'I\'d love to discuss some strategies for improving your communication patterns. When works for you?',
+                    lastMessageAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+                    unreadCount: 1,
+                  },
+                  {
                     id: 'conv-friend-sarah-lopez',
                     userId: state.profile.id,
                     participantId: 'user-sarah-lopez',
@@ -1800,8 +1812,8 @@ const appStore = create<AppState>()(
                     participantAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
                     isPartner: false,
                     relationshipType: 'friend',
-                    lastMessage: 'I\'d love to discuss some strategies that could help...',
-                    lastMessageAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                    lastMessage: 'I\'d love to discuss some strategies f...',
+                    lastMessageAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
                     unreadCount: 1,
                   },
                   {
@@ -1974,8 +1986,9 @@ const appStore = create<AppState>()(
                 const hasPartner = state.conversations.some(c => c.isPartner || c.relationshipType === 'partner');
                 const hasFriends = state.conversations.some(c => c.relationshipType === 'friend');
                 const hasCommunity = state.conversations.some(c => c.relationshipType === 'community');
+                const hasCoach = state.conversations.some(c => c.relationshipType === 'coach');
                 
-                if (!hasPartner || !hasFriends || !hasCommunity) {
+                if (!hasPartner || !hasFriends || !hasCommunity || !hasCoach) {
                   console.log('[Hydration] Missing conversation categories, re-seeding all...');
                   
                   const jan2 = '2026-01-02T10:00:00.000Z';
@@ -1996,6 +2009,18 @@ const appStore = create<AppState>()(
                       unreadCount: 0,
                     },
                     {
+                      id: 'conv-coach-sarah',
+                      userId: state.profile.id,
+                      participantId: 'coach-sarah',
+                      participantName: 'Dr. Sarah Lopez',
+                      participantAvatar: 'https://i.pravatar.cc/300?img=1',
+                      isPartner: false,
+                      relationshipType: 'coach',
+                      lastMessage: 'I\'d love to discuss some strategies for improving your communication patterns. When works for you?',
+                      lastMessageAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+                      unreadCount: 1,
+                    },
+                    {
                       id: 'conv-friend-sarah-lopez',
                       userId: state.profile.id,
                       participantId: 'user-sarah-lopez',
@@ -2003,8 +2028,8 @@ const appStore = create<AppState>()(
                       participantAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
                       isPartner: false,
                       relationshipType: 'friend',
-                      lastMessage: 'I\'d love to discuss some strategies that could help...',
-                      lastMessageAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                      lastMessage: 'I\'d love to discuss some strategies f...',
+                      lastMessageAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
                       unreadCount: 1,
                     },
                     {

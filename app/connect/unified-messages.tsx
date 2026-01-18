@@ -14,7 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { Search, ChevronLeft, PenLine, Mail } from 'lucide-react-native';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/colors';
-import { SEED_COACHES } from '@/constants/plus-data';
+
 import { useAppStore } from '@/store/appStore';
 import ConversationRow from '@/components/ConversationRow';
 import type { Conversation } from '@/types';
@@ -37,7 +37,6 @@ export default function UnifiedMessagesScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const storeConversations = useAppStore((state) => state.conversations);
 
-  const seededCoach = SEED_COACHES[0];
   const allConversations = useMemo(() => {
     return [...storeConversations].sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
@@ -62,6 +61,16 @@ export default function UnifiedMessagesScreen() {
           unreadCount: conv.unreadCount,
           type: 'partner',
         });
+      } else if (conv.relationshipType === 'coach') {
+        unified.push({
+          id: `coach-${conv.id}`,
+          participantName: conv.participantName,
+          participantAvatar: conv.participantAvatar || '',
+          lastMessage: conv.lastMessage || '',
+          lastMessageAt: conv.lastMessageAt || new Date().toISOString(),
+          unreadCount: conv.unreadCount,
+          type: 'coach',
+        });
       } else if (conv.relationshipType === 'community') {
         unified.push({
           id: `community-${conv.id}`,
@@ -72,7 +81,7 @@ export default function UnifiedMessagesScreen() {
           unreadCount: conv.unreadCount,
           type: 'community',
         });
-      } else if (conv.relationshipType !== 'coach' && !conv.id.includes('coach') && !conv.participantId?.includes('coach')) {
+      } else {
         unified.push({
           id: `friend-${conv.id}`,
           participantName: conv.participantName,
@@ -83,16 +92,6 @@ export default function UnifiedMessagesScreen() {
           type: 'friend',
         });
       }
-    });
-
-    unified.push({
-      id: 'coach-sarah',
-      participantName: seededCoach.name,
-      participantAvatar: seededCoach.photoUrl,
-      lastMessage: "I'd love to discuss some strategies for improving your communication patterns. When works for you?",
-      lastMessageAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      unreadCount: 1,
-      type: 'coach',
     });
 
     unified.push({
@@ -113,7 +112,7 @@ export default function UnifiedMessagesScreen() {
     });
 
     return unified;
-  }, [allConversations, seededCoach]);
+  }, [allConversations]);
 
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) return unifiedConversations;
@@ -181,11 +180,7 @@ export default function UnifiedMessagesScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     const realConvId = item.id.replace(/^(partner-|friend-|coach-|intell-|community-)/, '');
-    if (item.type === 'coach') {
-      router.push(`/connect/chat/conv-coach-sarah` as any);
-    } else {
-      router.push(`/connect/chat/${realConvId}` as any);
-    }
+    router.push(`/connect/chat/${realConvId}` as any);
   };
 
   return (
@@ -293,7 +288,7 @@ export default function UnifiedMessagesScreen() {
 
           {intellConversations.length > 0 && (
             <View style={styles.categorySection}>
-              <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>inTELL AI</Text>
+              <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>INTELL AI</Text>
               <View style={styles.categoryContent}>
                 {intellConversations.map((conv) => (
                   <View key={conv.id}>

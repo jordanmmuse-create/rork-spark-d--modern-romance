@@ -14,7 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { Search, ChevronLeft, PenLine, Mail } from 'lucide-react-native';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/colors';
-import { SEED_COACHES } from '@/constants/plus-data';
+
 import { useAppStore } from '@/store/appStore';
 import ConversationRow from '@/components/ConversationRow';
 import type { Conversation } from '@/types';
@@ -37,8 +37,6 @@ export default function GuidanceMessagesScreen() {
   
   const storeConversations = useAppStore((state) => state.conversations);
   
-  const seededCoach = SEED_COACHES[0];
-  
   const allConversations = useMemo(() => {
     return [...storeConversations].sort((a, b) => {
       if (a.isPartner !== b.isPartner) return a.isPartner ? -1 : 1;
@@ -49,55 +47,23 @@ export default function GuidanceMessagesScreen() {
   }, [storeConversations]);
   
   const partnerConversation = useMemo(() => 
-    allConversations.find(conv => conv.isPartner),
+    allConversations.find(conv => conv.isPartner || conv.relationshipType === 'partner'),
     [allConversations]
   );
   
-  const coachConversation = useMemo(() => 
-    allConversations.find(conv => conv.id === 'conv-coach-sarah' || conv.participantId === 'coach-sarah'),
+  const coachConversations = useMemo(() => 
+    allConversations.filter(conv => conv.relationshipType === 'coach'),
     [allConversations]
   );
 
-  console.log('[GuidanceMessages] Coach conversation from store:', coachConversation?.id, 'unreadCount:', coachConversation?.unreadCount);
+  console.log('[GuidanceMessages] Coach conversations count:', coachConversations.length);
   console.log('[GuidanceMessages] All conversations count:', allConversations.length);
 
   const conversations = useMemo<GuidanceConversation[]>(() => {
     const guidanceConvs: GuidanceConversation[] = [];
     
-    if (coachConversation) {
-      guidanceConvs.push({
-        id: coachConversation.id,
-        participantName: coachConversation.participantName || seededCoach.name,
-        participantAvatar: coachConversation.participantAvatar || seededCoach.photoUrl,
-        lastMessage: coachConversation.lastMessage || "I'd love to discuss some strategies for improving your communication patterns. When works for you?",
-        lastMessageAt: coachConversation.lastMessageAt || new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        unreadCount: coachConversation.unreadCount,
-        type: 'coach' as const,
-      });
-    } else {
-      guidanceConvs.push({
-        id: 'conv-coach-sarah',
-        participantName: seededCoach.name,
-        participantAvatar: seededCoach.photoUrl,
-        lastMessage: "I'd love to discuss some strategies for improving your communication patterns. When works for you?",
-        lastMessageAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        unreadCount: 1,
-        type: 'coach' as const,
-      });
-    }
-    
-    guidanceConvs.push({
-      id: 'intell-ai',
-      participantName: 'inTELL AI',
-      participantAvatar: '',
-      lastMessage: 'Coming Soon',
-      lastMessageAt: new Date().toISOString(),
-      unreadCount: 0,
-      type: 'intell' as const,
-    });
-  
     if (partnerConversation) {
-      guidanceConvs.unshift({
+      guidanceConvs.push({
         id: partnerConversation.id,
         participantName: partnerConversation.participantName,
         participantAvatar: partnerConversation.participantAvatar || '',
@@ -108,8 +74,30 @@ export default function GuidanceMessagesScreen() {
       });
     }
     
+    coachConversations.forEach(conv => {
+      guidanceConvs.push({
+        id: conv.id,
+        participantName: conv.participantName,
+        participantAvatar: conv.participantAvatar || '',
+        lastMessage: conv.lastMessage || '',
+        lastMessageAt: conv.lastMessageAt || new Date().toISOString(),
+        unreadCount: conv.unreadCount,
+        type: 'coach' as const,
+      });
+    });
+    
+    guidanceConvs.push({
+      id: 'intell-ai',
+      participantName: 'inTELL AI',
+      participantAvatar: '',
+      lastMessage: 'Coming Soon',
+      lastMessageAt: new Date().toISOString(),
+      unreadCount: 0,
+      type: 'intell' as const,
+    });
+    
     return guidanceConvs;
-  }, [seededCoach, partnerConversation, coachConversation]);
+  }, [partnerConversation, coachConversations]);
 
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) return conversations;
@@ -121,11 +109,11 @@ export default function GuidanceMessagesScreen() {
     );
   }, [conversations, searchQuery]);
 
-  const partnerConversations = useMemo(() => {
+  const partnerGuidanceConvs = useMemo(() => {
     return filteredConversations.filter(conv => conv.type === 'partner');
   }, [filteredConversations]);
 
-  const coachConversations = useMemo(() => 
+  const coachGuidanceConvs = useMemo(() => 
     filteredConversations.filter(conv => conv.type === 'coach'),
     [filteredConversations]
   );
@@ -234,11 +222,11 @@ export default function GuidanceMessagesScreen() {
         </View>
 
         <View style={styles.conversationsContainer}>
-          {partnerConversations.length > 0 && (
+          {partnerGuidanceConvs.length > 0 && (
             <View style={styles.categorySection}>
               <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>PARTNER</Text>
               <View style={styles.categoryContent}>
-                {partnerConversations.map((conv) => (
+                {partnerGuidanceConvs.map((conv) => (
                   <View key={conv.id}>
                     <ConversationRow
                       conversation={getConversationFromGuidance(conv)}
@@ -251,11 +239,11 @@ export default function GuidanceMessagesScreen() {
             </View>
           )}
 
-          {coachConversations.length > 0 && (
+          {coachGuidanceConvs.length > 0 && (
             <View style={styles.categorySection}>
               <Text style={[styles.categoryLabel, { color: colors.textSecondary }]}>COACHES</Text>
               <View style={styles.categoryContent}>
-                {coachConversations.map((conv) => (
+                {coachGuidanceConvs.map((conv) => (
                   <View key={conv.id}>
                     <ConversationRow
                       conversation={getConversationFromGuidance(conv)}
@@ -284,7 +272,7 @@ export default function GuidanceMessagesScreen() {
             </View>
           )}
 
-          {partnerConversations.length === 0 && coachConversations.length === 0 && intellConversations.length === 0 && (
+          {partnerGuidanceConvs.length === 0 && coachGuidanceConvs.length === 0 && intellConversations.length === 0 && (
             <View style={styles.emptyContainer}>
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
                 {searchQuery.trim() ? 'No conversations found' : 'No messages yet'}
