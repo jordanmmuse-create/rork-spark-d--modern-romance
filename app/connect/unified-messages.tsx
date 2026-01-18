@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Platform,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -35,7 +36,20 @@ export default function UnifiedMessagesScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useThemeStyles();
   const [searchQuery, setSearchQuery] = useState<string>('');
+  
+  const hasHydrated = useAppStore((state) => state._hasHydrated);
+  const ensureSeededConversations = useAppStore((state) => state.ensureSeededConversations);
+  const isSeedingConversations = useAppStore((state) => state._isSeedingConversations);
   const storeConversations = useAppStore((state) => state.conversations);
+  
+  useEffect(() => {
+    if (!hasHydrated) {
+      console.log('[UnifiedMessages] Waiting for hydration...');
+      return;
+    }
+    console.log('[UnifiedMessages] Hydrated, ensuring seeded conversations...');
+    ensureSeededConversations();
+  }, [hasHydrated, ensureSeededConversations]);
 
   const allConversations = useMemo(() => {
     return [...storeConversations].sort((a, b) => {
@@ -140,7 +154,11 @@ export default function UnifiedMessagesScreen() {
   );
 
   const friendConversations = useMemo(() => 
-    filteredConversations.filter(conv => conv.type === 'friend'),
+    filteredConversations.filter(conv => 
+      conv.type === 'friend' && 
+      !conv.id.includes('sarah-lopez') &&
+      conv.participantName !== 'Dr. Sarah Lopez'
+    ),
     [filteredConversations]
   );
 
@@ -182,6 +200,15 @@ export default function UnifiedMessagesScreen() {
     const realConvId = item.id.replace(/^(partner-|friend-|coach-|intell-|community-)/, '');
     router.push(`/connect/chat/${realConvId}` as any);
   };
+
+  if (!hasHydrated || isSeedingConversations) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading conversations...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -438,6 +465,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: TYPOGRAPHY.sizes.md,
+  },
+  loadingText: {
+    fontSize: TYPOGRAPHY.sizes.md,
+    marginTop: SPACING.md,
   },
   conversationsContainer: {
     paddingHorizontal: SPACING.lg,

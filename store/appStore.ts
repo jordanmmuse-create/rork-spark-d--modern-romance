@@ -34,6 +34,8 @@ import { SEED_PARQ_ITEMS, SEED_INSPO_POSTS, getUserSeededStories } from '@/const
 interface AppState {
   _hasHydrated: boolean;
   setHasHydrated: (hydrated: boolean) => void;
+  _hasSeededConversations: boolean;
+  _isSeedingConversations: boolean;
   _lastSparkCheck: string | null;
   theme: 'light' | 'dark';
   hasSeenSparkFlipHint: boolean;
@@ -173,6 +175,8 @@ interface AppState {
   clearPendingSparkShare: () => void;
   sendSparkShareMessage: (conversationId: string, sparkShare: SparkShareContent, comment?: string) => void;
   
+  ensureSeededConversations: () => void;
+  
   setTheme: (theme: 'light' | 'dark') => void;
   
   markSparkFlipHintSeen: () => void;
@@ -195,6 +199,8 @@ const appStore = create<AppState>()(
     (set, get) => ({
       _hasHydrated: false,
       setHasHydrated: (hydrated) => set({ _hasHydrated: hydrated }),
+      _hasSeededConversations: false,
+      _isSeedingConversations: false,
       _lastSparkCheck: null,
       theme: 'dark',
       hasSeenSparkFlipHint: false,
@@ -1570,6 +1576,169 @@ const appStore = create<AppState>()(
         set({ pendingSparkShare: null });
       },
       
+      ensureSeededConversations: () => {
+        const state = get();
+        if (!state._hasHydrated) {
+          console.log('[ensureSeededConversations] Not hydrated yet, skipping');
+          return;
+        }
+        if (state._isSeedingConversations) {
+          console.log('[ensureSeededConversations] Already seeding, skipping');
+          return;
+        }
+        if (state._hasSeededConversations) {
+          console.log('[ensureSeededConversations] Already seeded, skipping');
+          return;
+        }
+        if (!state.profile) {
+          console.log('[ensureSeededConversations] No profile, skipping');
+          return;
+        }
+        
+        set({ _isSeedingConversations: true });
+        console.log('[ensureSeededConversations] Starting conversation seeding...');
+        
+        const now = new Date();
+        const jan2 = '2026-01-02T10:00:00.000Z';
+        const jan1 = '2026-01-01T14:00:00.000Z';
+        const dec31 = '2025-12-31T16:00:00.000Z';
+        
+        let conversations = [...state.conversations];
+        let messages = [...state.messages];
+        
+        // Remove any "Dr. Sarah Lopez" friend conversation (she should only be coach)
+        const sarahFriendIds = ['conv-friend-sarah-lopez'];
+        conversations = conversations.filter(c => !sarahFriendIds.includes(c.id));
+        messages = messages.filter(m => !sarahFriendIds.includes(m.conversationId));
+        
+        // Check what's missing
+        const hasPartner = conversations.some(c => c.isPartner || c.relationshipType === 'partner');
+        const hasCoach = conversations.some(c => c.relationshipType === 'coach');
+        const hasFriends = conversations.some(c => c.relationshipType === 'friend');
+        const hasCommunity = conversations.some(c => c.relationshipType === 'community');
+        
+        console.log('[ensureSeededConversations] Current state:', { hasPartner, hasCoach, hasFriends, hasCommunity });
+        
+        // Seed partner if missing
+        if (!hasPartner) {
+          console.log('[ensureSeededConversations] Adding partner conversation');
+          conversations.push({
+            id: 'conv-partner',
+            userId: state.profile.id,
+            participantId: 'user-partner',
+            participantName: 'Alex',
+            participantAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+            isPartner: true,
+            relationshipType: 'partner',
+            lastMessage: 'Can\'t wait to see you tonight! 💕',
+            lastMessageAt: jan2,
+            unreadCount: 0,
+          });
+          messages.push(
+            { id: 'msg-1', conversationId: 'conv-partner', senderId: 'user-partner', content: 'Good morning! ☀️', createdAt: '2026-01-02T08:00:00.000Z', read: true },
+            { id: 'msg-2', conversationId: 'conv-partner', senderId: state.profile.id, content: 'Morning babe! How did you sleep?', createdAt: '2026-01-02T08:30:00.000Z', read: true },
+            { id: 'msg-3', conversationId: 'conv-partner', senderId: 'user-partner', content: 'So good! Excited for dinner tonight', createdAt: '2026-01-02T09:00:00.000Z', read: true },
+            { id: 'msg-4', conversationId: 'conv-partner', senderId: 'user-partner', content: 'Can\'t wait to see you tonight! 💕', createdAt: jan2, read: true }
+          );
+        }
+        
+        // Seed coach if missing
+        if (!hasCoach) {
+          console.log('[ensureSeededConversations] Adding coach conversation');
+          conversations.push({
+            id: 'conv-coach-sarah',
+            userId: state.profile.id,
+            participantId: 'coach-sarah',
+            participantName: 'Dr. Sarah Lopez',
+            participantAvatar: 'https://i.pravatar.cc/300?img=1',
+            isPartner: false,
+            relationshipType: 'coach',
+            lastMessage: 'I\'d love to discuss some strategies for improving your communication patterns. When works for you?',
+            lastMessageAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+            unreadCount: 1,
+          });
+        }
+        
+        // Seed friends if missing
+        if (!hasFriends) {
+          console.log('[ensureSeededConversations] Adding friend conversations');
+          conversations.push(
+            {
+              id: 'conv-friend1',
+              userId: state.profile.id,
+              participantId: 'user-friend1',
+              participantName: 'Sarah',
+              participantAvatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop',
+              isPartner: false,
+              relationshipType: 'friend',
+              lastMessage: 'Hey! Did you see the new coffee shop?',
+              lastMessageAt: jan2,
+              unreadCount: 0,
+            },
+            {
+              id: 'conv-friend2',
+              userId: state.profile.id,
+              participantId: 'user-friend2',
+              participantName: 'Mike',
+              participantAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+              isPartner: false,
+              relationshipType: 'friend',
+              lastMessage: 'Thanks for the advice!',
+              lastMessageAt: jan1,
+              unreadCount: 0,
+            },
+            {
+              id: 'conv-friend3',
+              userId: state.profile.id,
+              participantId: 'user-friend3',
+              participantName: 'Emma',
+              participantAvatar: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=400&fit=crop',
+              isPartner: false,
+              relationshipType: 'friend',
+              lastMessage: 'Let me know when you\'re free!',
+              lastMessageAt: dec31,
+              unreadCount: 0,
+            }
+          );
+          messages.push(
+            { id: 'msg-5', conversationId: 'conv-friend1', senderId: 'user-friend1', content: 'Hey! Did you see the new coffee shop?', createdAt: jan2, read: true },
+            { id: 'msg-6', conversationId: 'conv-friend2', senderId: state.profile.id, content: 'What do you think about this?', createdAt: '2026-01-01T12:00:00.000Z', read: true },
+            { id: 'msg-7', conversationId: 'conv-friend2', senderId: 'user-friend2', content: 'Thanks for the advice!', createdAt: jan1, read: true },
+            { id: 'msg-8', conversationId: 'conv-friend3', senderId: 'user-friend3', content: 'Let me know when you\'re free!', createdAt: dec31, read: true }
+          );
+        }
+        
+        // Seed community if missing
+        if (!hasCommunity) {
+          console.log('[ensureSeededConversations] Adding community conversation');
+          conversations.push({
+            id: 'conv-community-kai',
+            userId: state.profile.id,
+            participantId: 'user-community-kai',
+            participantName: 'Kai Bennett',
+            participantAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop',
+            isPartner: false,
+            relationshipType: 'community',
+            lastMessage: 'Yo I saw your post in Singles & Thriving...',
+            lastMessageAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
+            unreadCount: 1,
+          });
+          messages.push(
+            { id: 'msg-community-kai-1', conversationId: 'conv-community-kai', senderId: 'user-community-kai', content: 'Hey! Just saw you in the Singles & Thriving room', createdAt: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(), read: true },
+            { id: 'msg-community-kai-2', conversationId: 'conv-community-kai', senderId: state.profile.id, content: 'Oh hey! Yeah I\'ve been hanging out there lately', createdAt: new Date(now.getTime() - 4.5 * 60 * 60 * 1000).toISOString(), read: true },
+            { id: 'msg-community-kai-3', conversationId: 'conv-community-kai', senderId: 'user-community-kai', content: 'Yo I saw your post in Singles & Thriving...', createdAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(), read: false }
+          );
+        }
+        
+        console.log('[ensureSeededConversations] Seeding complete. Conversations:', conversations.length);
+        set({
+          conversations,
+          messages,
+          _hasSeededConversations: true,
+          _isSeedingConversations: false,
+        });
+      },
+      
       sendSparkShareMessage: (conversationId: string, sparkShare: SparkShareContent, comment?: string) => {
         const { profile, conversations, messages } = get();
         if (!profile) return;
@@ -1710,7 +1879,7 @@ const appStore = create<AppState>()(
         },
       })),
       partialize: (state) => {
-        const { _hasHydrated, setHasHydrated, ...rest } = state;
+        const { _hasHydrated, setHasHydrated, _hasSeededConversations, _isSeedingConversations, ...rest } = state;
         return rest as AppState;
       },
       onRehydrateStorage: () => {
