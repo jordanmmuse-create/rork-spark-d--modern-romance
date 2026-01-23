@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
   categoryPill: {
     flex: 1,
-    paddingVertical: SPACING.sm * 1.18,
+    paddingVertical: SPACING.sm * 1.06,
     paddingHorizontal: SPACING.sm * 1.18,
     borderRadius: 12,
     borderWidth: 1,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   categoryPillText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: TYPOGRAPHY.weights.medium,
     flexShrink: 0,
   },
