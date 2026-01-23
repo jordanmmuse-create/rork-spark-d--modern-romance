@@ -154,7 +154,7 @@ export default function SparksModalScreen() {
           headerTintColor: colors.text,
           headerTitleAlign: 'center',
           headerStyle: {
-            backgroundColor: 'rgba(20,20,24,0.6)',
+            backgroundColor: '#121214',
           },
           headerTitle: () => headerTitle as any,
         }}

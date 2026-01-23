@@ -9,7 +9,7 @@ import {
   Dimensions,
   Modal,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY, getThemeTagColor } from '@/constants/colors';
@@ -46,7 +46,6 @@ export default function SparkCardModal({
   useNativeModal = true,
 }: SparkCardModalProps) {
   const { colors } = useThemeStyles();
-  const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
   const isClosing = useRef(false);
   const canDismiss = useRef(false);
@@ -136,21 +135,8 @@ export default function SparkCardModal({
   }, [onPressSend, spark]);
 
   const centerContainerStyle = useMemo(() => {
-    if (!useNativeModal) {
-      const headerHeight = Platform.select({ ios: 44, android: 56, default: 56 });
-      const statusBarHeight = insets.top;
-      const totalHeaderSpace = headerHeight + statusBarHeight;
-      return [
-        styles.centerContainer,
-        { 
-          top: 0,
-          marginTop: -totalHeaderSpace,
-          height: Dimensions.get('window').height,
-        },
-      ];
-    }
     return styles.centerContainer;
-  }, [useNativeModal, insets.top]);
+  }, []);
 
   if (!shouldRender || !spark) {
     return null;
