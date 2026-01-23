@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 24,
   },
   headerLogo: {
     width: 230,
