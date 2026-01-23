@@ -156,6 +156,9 @@ export default function SparksModalScreen() {
           headerStyle: {
             backgroundColor: '#121214',
           },
+          headerTitleContainerStyle: {
+            paddingTop: 16,
+          },
           headerTitle: () => headerTitle as any,
         }}
       />
@@ -192,7 +195,8 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 24,
+    paddingVertical: 8,
+    paddingTop: 12,
   },
   headerLogo: {
     width: 230,
