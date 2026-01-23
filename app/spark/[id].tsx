@@ -241,7 +241,6 @@ customHeader: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.lg,
   },
   headerTitle: {
     fontSize: 17,
