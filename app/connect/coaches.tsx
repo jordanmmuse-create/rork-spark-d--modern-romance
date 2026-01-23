@@ -369,13 +369,13 @@ const styles = StyleSheet.create({
   categoriesContainer: {
     flexDirection: 'row',
     marginBottom: SPACING.lg,
-    gap: 6,
+    gap: 0,
     flexWrap: 'nowrap',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   categoryPill: {
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.sm * 1.18,
+    paddingHorizontal: SPACING.sm * 1.18,
     borderRadius: BORDER_RADIUS.full,
     borderWidth: 1,
     alignItems: 'center',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   categoryPillText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: TYPOGRAPHY.weights.medium,
     flexShrink: 0,
   },
