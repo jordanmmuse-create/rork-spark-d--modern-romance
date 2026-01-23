@@ -369,11 +369,11 @@ const styles = StyleSheet.create({
   categoriesContainer: {
     flexDirection: 'row',
     marginBottom: SPACING.lg,
-    gap: 0,
+    gap: SPACING.xs,
     flexWrap: 'nowrap',
-    justifyContent: 'space-between',
   },
   categoryPill: {
+    flex: 1,
     paddingVertical: SPACING.sm * 1.18,
     paddingHorizontal: SPACING.sm * 1.18,
     borderRadius: 12,
