@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  Modal,
 } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search, Map, Play, CheckCircle2, Library } from 'lucide-react-native';
+import { Search, Map, Play, CheckCircle2, Library, Filter, ChevronLeft } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAppStore } from '@/store/appStore';
 import { FOCUS_AREA_INFO } from '@/constants/data';
@@ -18,7 +19,9 @@ import { SPACING, BORDER_RADIUS, TYPOGRAPHY, FOCUS_AREA_COLORS } from '@/constan
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { Journey, FocusArea } from '@/types';
 
-const CATEGORIES: { id: string; label: string; value: FocusArea | 'all' }[] = [
+type CategoryId = 'all' | 'communication' | 'trust' | 'conflict' | 'play' | 'growth' | 'gratitude' | 'intimacy' | 'boundaries';
+
+const CATEGORIES: { id: CategoryId; label: string; value: FocusArea | 'all' }[] = [
   { id: 'all', label: 'All', value: 'all' },
   { id: 'communication', label: 'Communication', value: 'communication' },
   { id: 'trust', label: 'Trust', value: 'trust' },
@@ -29,6 +32,24 @@ const CATEGORIES: { id: string; label: string; value: FocusArea | 'all' }[] = [
   { id: 'intimacy', label: 'Intimacy', value: 'intimacy' },
   { id: 'boundaries', label: 'Boundaries', value: 'boundaries' },
 ];
+
+function toggleCategory(
+  current: CategoryId[],
+  nextId: CategoryId
+): CategoryId[] {
+  const set = new Set(current);
+
+  if (nextId === 'all') return ['all'];
+
+  set.delete('all');
+
+  if (set.has(nextId)) set.delete(nextId);
+  else set.add(nextId);
+
+  if (set.size === 0) return ['all'];
+
+  return Array.from(set);
+}
 
 function getCategoryColor(categoryId: string): string {
   const colorMap: Record<string, string> = {
@@ -48,24 +69,35 @@ function getCategoryColor(categoryId: string): string {
 export default function ExploreJourneysScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useThemeStyles();
+  const router = useRouter();
   const { getJourneys, userJourneys, startJourney } = useAppStore();
   const journeys = getJourneys();
   
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<CategoryId[]>(['all']);
   const [selectedJourneyType, setSelectedJourneyType] = useState<'devotional' | 'workshop'>('workshop');
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState<boolean>(false);
+  
+  const hasActiveFilters = selectedCategoryIds.length > 0 && !selectedCategoryIds.includes('all');
   
   const filteredJourneys = useMemo(() => {
     return journeys.filter((journey) => {
       const matchesSearch = searchQuery === '' ||
         journey.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         journey.overview.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' ||
-        journey.focusAreas.includes(selectedCategory as FocusArea);
+      const matchesCategory = selectedCategoryIds.includes('all') ||
+        journey.focusAreas.some((area) => selectedCategoryIds.includes(area as CategoryId));
       const matchesType = journey.journeyType === selectedJourneyType;
       return matchesSearch && matchesCategory && matchesType;
     });
-  }, [journeys, searchQuery, selectedCategory, selectedJourneyType]);
+  }, [journeys, searchQuery, selectedCategoryIds, selectedJourneyType]);
+  
+  const resetFilters = () => {
+    setSelectedCategoryIds(['all']);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  };
   
   const handleStartJourney = (journeyId: string) => {
     startJourney(journeyId);
@@ -78,14 +110,55 @@ export default function ExploreJourneysScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
-          title: 'Explore Journeys!',
-          headerStyle: {
-            backgroundColor: colors.background,
-          },
-          headerTintColor: colors.text,
-          headerShadowVisible: false,
+          headerShown: false,
         }}
       />
+      <View
+        style={[
+          styles.headerBar,
+          {
+            paddingTop: insets.top + SPACING.md,
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            onPress={() => {
+              console.log('[ExploreJourneys] Back pressed');
+              if (Platform.OS !== 'web') {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+              router.back();
+            }}
+            style={[styles.backButton, { borderColor: colors.border }]}
+            activeOpacity={0.7}
+          >
+            <ChevronLeft size={18} color={colors.text} strokeWidth={2.5} />
+            <Text style={[styles.backButtonText, { color: colors.text }]}>Back</Text>
+          </TouchableOpacity>
+
+          <View style={styles.headerCenter}>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>Explore Journeys!</Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => {
+              setIsFilterModalVisible(true);
+              if (Platform.OS !== 'web') {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+            }}
+            style={styles.headerRight}
+            activeOpacity={0.7}
+          >
+            <Filter size={24} color={colors.text} strokeWidth={2} />
+            {hasActiveFilters && (
+              <View style={[styles.filterBadge, { backgroundColor: '#1988B2' }]} />
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
@@ -170,19 +243,20 @@ export default function ExploreJourneysScreen() {
         >
           {CATEGORIES.map((category) => {
             const categoryColor = getCategoryColor(category.id);
+            const isSelected = selectedCategoryIds.includes(category.id);
             return (
               <TouchableOpacity
                 key={category.id}
                 style={[
                   styles.categoryChip,
                   { backgroundColor: colors.card, borderColor: colors.border },
-                  selectedCategory === category.id && [
+                  isSelected && [
                     styles.categoryChipActive,
                     { backgroundColor: categoryColor + '20', borderColor: categoryColor },
                   ],
                 ]}
                 onPress={() => {
-                  setSelectedCategory(category.id);
+                  setSelectedCategoryIds(prev => toggleCategory(prev, category.id));
                   if (Platform.OS !== 'web') {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }
@@ -193,7 +267,7 @@ export default function ExploreJourneysScreen() {
                   style={[
                     styles.categoryChipText,
                     { color: colors.textSecondary },
-                    selectedCategory === category.id && [
+                    isSelected && [
                       styles.categoryChipTextActive,
                       { color: categoryColor },
                     ],
@@ -229,7 +303,133 @@ export default function ExploreJourneysScreen() {
           })
         )}
       </ScrollView>
+
+      <FilterModal
+        visible={isFilterModalVisible}
+        onClose={() => setIsFilterModalVisible(false)}
+        selectedCategoryIds={selectedCategoryIds}
+        onApply={(categoryIds) => {
+          setSelectedCategoryIds(categoryIds);
+          setIsFilterModalVisible(false);
+          if (Platform.OS !== 'web') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+        }}
+        onReset={resetFilters}
+      />
     </View>
+  );
+}
+
+interface FilterModalProps {
+  visible: boolean;
+  onClose: () => void;
+  selectedCategoryIds: CategoryId[];
+  onApply: (categoryIds: CategoryId[]) => void;
+  onReset: () => void;
+}
+
+function FilterModal({ visible, onClose, selectedCategoryIds, onApply, onReset }: FilterModalProps) {
+  const { colors } = useThemeStyles();
+  const [tempCategoryIds, setTempCategoryIds] = useState<CategoryId[]>(selectedCategoryIds);
+
+  React.useEffect(() => {
+    if (visible) {
+      setTempCategoryIds(selectedCategoryIds);
+    }
+  }, [visible, selectedCategoryIds]);
+
+  const handleApply = () => {
+    onApply(tempCategoryIds);
+  };
+
+  const handleReset = () => {
+    setTempCategoryIds(['all']);
+    onReset();
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+          <View style={styles.modalHeader}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Filter Journeys</Text>
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles.modalClose}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modalCloseText, { color: colors.textSecondary }]}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+            <Text style={[styles.filterSectionTitle, { color: colors.text }]}>Category</Text>
+            <View style={styles.filterOptions}>
+              {CATEGORIES.map((category) => {
+                const categoryColor = getCategoryColor(category.id);
+                const isSelected = tempCategoryIds.includes(category.id);
+                return (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={[
+                      styles.filterOption,
+                      { backgroundColor: colors.background, borderColor: colors.border },
+                      isSelected && [
+                        styles.filterOptionActive,
+                        { backgroundColor: categoryColor + '20', borderColor: categoryColor },
+                      ],
+                    ]}
+                    onPress={() => {
+                      setTempCategoryIds(prev => toggleCategory(prev, category.id));
+                      if (Platform.OS !== 'web') {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.filterOptionText,
+                        { color: colors.textSecondary },
+                        isSelected && [
+                          styles.filterOptionTextActive,
+                          { color: categoryColor },
+                        ],
+                      ]}
+                    >
+                      {category.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </ScrollView>
+          
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonSecondary, { borderColor: colors.border }]}
+              onPress={handleReset}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modalButtonText, { color: colors.textSecondary }]}>Reset</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalButtonPrimary, { backgroundColor: '#1988B2' }]}
+              onPress={handleApply}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.modalButtonText, styles.modalButtonTextPrimary]}>Apply</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -339,6 +539,60 @@ function JourneyCard({ journey, isActive, progress, onStart }: JourneyCardProps)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  headerBar: {
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.md,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.full,
+    borderWidth: 1,
+    gap: SPACING.xs,
+    backgroundColor: 'transparent',
+    flexShrink: 0,
+  },
+  backButtonText: {
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.medium,
+  },
+  headerCenter: {
+    position: 'absolute' as const,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    pointerEvents: 'none' as const,
+  },
+  headerTitle: {
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
+  },
+  headerRight: {
+    minWidth: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative' as const,
+    flexShrink: 0,
+  },
+  filterBadge: {
+    position: 'absolute' as const,
+    top: 6,
+    right: 6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   scrollContent: {
     paddingHorizontal: SPACING.lg,
@@ -538,5 +792,92 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: TYPOGRAPHY.sizes.md,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: BORDER_RADIUS.xl,
+    borderTopRightRadius: BORDER_RADIUS.xl,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.xl,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  modalTitle: {
+    fontSize: TYPOGRAPHY.sizes.xl,
+    fontWeight: TYPOGRAPHY.weights.bold,
+  },
+  modalClose: {
+    padding: SPACING.xs,
+  },
+  modalCloseText: {
+    fontSize: 24,
+  },
+  modalScroll: {
+    paddingHorizontal: SPACING.lg,
+  },
+  filterSectionTitle: {
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.sm,
+    marginTop: SPACING.md,
+  },
+  filterOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+    borderWidth: 1.5,
+    gap: SPACING.xs - 2,
+  },
+  filterOptionActive: {
+    borderWidth: 2,
+  },
+  filterOptionText: {
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.medium,
+  },
+  filterOptionTextActive: {
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.lg,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonSecondary: {
+    borderWidth: 1.5,
+  },
+  modalButtonPrimary: {},
+  modalButtonText: {
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  modalButtonTextPrimary: {
+    color: '#FFFFFF',
   },
 });
