@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Search, ChevronLeft, PenLine, Mail } from 'lucide-react-native';
+import { Search, ChevronLeft, Mail } from 'lucide-react-native';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/colors';
 import { SEED_COACHES } from '@/constants/plus-data';
@@ -198,17 +198,7 @@ export default function GuidanceMessagesScreen() {
             <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>+ Messenger</Text>
           </View>
 
-          <TouchableOpacity
-            onPress={() => {
-              if (Platform.OS !== 'web') {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }
-            }}
-            style={styles.headerRight}
-            activeOpacity={0.7}
-          >
-            <PenLine size={24} color={colors.text} strokeWidth={2} />
-          </TouchableOpacity>
+          <View style={styles.headerRight} />
         </View>
       </View>
       
