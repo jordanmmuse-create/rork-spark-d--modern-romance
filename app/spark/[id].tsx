@@ -103,7 +103,7 @@ export default function SparkDetailScreen() {
         onPress={handleExitPage}
       >
         <TouchableOpacity 
-          style={[styles.customHeader, { backgroundColor: colors.backgroundSecondary, paddingTop: insets.top + SPACING.lg }]}
+          style={[styles.customHeader, { backgroundColor: colors.backgroundSecondary, paddingTop: insets.top }]}
           activeOpacity={0.7}
           onPress={handleExitPage}
         >
