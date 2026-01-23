@@ -1820,6 +1820,31 @@ const appStore = create<AppState>()(
         
         const currentConversations = state.conversations;
         const currentMessages = state.messages;
+        
+        const hasPartner = currentConversations.some(c => c.id === 'conv-partner');
+        const hasFriends = currentConversations.some(c => c.id === 'conv-friend1');
+        const hasCommunity = currentConversations.some(c => c.id === 'conv-community-kai');
+        
+        console.log('[ensureSeededConversations] Current state - Partner:', hasPartner, 'Friends:', hasFriends, 'Community:', hasCommunity);
+        
+        if (!hasPartner || !hasFriends || !hasCommunity) {
+          console.log('[ensureSeededConversations] Missing core categories, force re-seeding all...');
+          
+          const nonSeededConversations = currentConversations.filter(c => 
+            !['conv-partner', 'conv-friend1', 'conv-friend2', 'conv-friend3', 'conv-community-kai'].includes(c.id)
+          );
+          const nonSeededMessages = currentMessages.filter(m => 
+            !['msg-1', 'msg-2', 'msg-3', 'msg-4', 'msg-5', 'msg-6', 'msg-7', 'msg-8', 'msg-community-kai-1', 'msg-community-kai-2', 'msg-community-kai-3'].includes(m.id)
+          );
+          
+          set({
+            conversations: [...seededConversations, ...nonSeededConversations],
+            messages: [...seededMessages, ...nonSeededMessages],
+          });
+          console.log('[ensureSeededConversations] Force re-seeded all core conversations');
+          return;
+        }
+        
         let conversationsUpdated = false;
         let messagesUpdated = false;
         

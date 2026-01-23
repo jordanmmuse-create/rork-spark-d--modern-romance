@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,13 @@ export default function MessagesScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useThemeStyles();
   const storeConversations = useAppStore((state) => state.conversations);
+  const ensureSeededConversations = useAppStore((state) => state.ensureSeededConversations);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  useEffect(() => {
+    console.log('[MessagesScreen] Ensuring seeded conversations on mount');
+    ensureSeededConversations();
+  }, [ensureSeededConversations]);
 
   const conversations = useMemo(() => {
     return [...storeConversations].sort((a, b) => {
