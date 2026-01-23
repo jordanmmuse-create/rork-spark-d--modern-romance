@@ -237,11 +237,10 @@ customHeader: {
     width: '100%',
   },
   headerContent: {
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.md,
-    paddingBottom: SPACING.md,
   },
   headerTitle: {
     fontSize: 17,
