@@ -237,7 +237,7 @@ customHeader: {
     width: '100%',
   },
   headerContent: {
-    height: 68,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: SPACING.lg,
