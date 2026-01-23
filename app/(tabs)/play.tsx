@@ -368,6 +368,29 @@ function PlayConnectCard({ challenge, colors }: { challenge: CommunityChallenge;
 function ChallengeCard({ challenge, colors }: { challenge: CommunityChallenge; colors: any }) {
   const participants = challenge.participants || 0;
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'deep':
+        return '#A78BFA';
+      case 'romantic':
+        return '#F472B6';
+      case 'fun':
+        return '#FBBF24';
+      case 'competitive':
+        return '#F97316';
+      case 'growth':
+        return '#10B981';
+      case 'play':
+        return '#3B82F6';
+      case 'communication':
+        return '#8B5CF6';
+      default:
+        return colors.accent;
+    }
+  };
+
+  const categoryColor = getCategoryColor(challenge.category);
+
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]} activeOpacity={0.8}>
       {challenge.emoji && (
@@ -377,12 +400,6 @@ function ChallengeCard({ challenge, colors }: { challenge: CommunityChallenge; c
         <Text style={[styles.cardTitle, { color: colors.text }]}>{challenge.title}</Text>
         <Text style={[styles.cardDescription, { color: colors.textSecondary }]}>{challenge.description}</Text>
         <View style={styles.cardMeta}>
-          <View style={styles.participantsBadge}>
-            <Users size={12} color={colors.textSecondary} />
-            <Text style={[styles.participantsText, { color: colors.textSecondary }]}>
-              {participants.toLocaleString()} joined
-            </Text>
-          </View>
           <View
             style={[
               styles.statusBadge,
@@ -406,6 +423,22 @@ function ChallengeCard({ challenge, colors }: { challenge: CommunityChallenge; c
               ]}
             >
               {challenge.status}
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: categoryColor + '20' },
+            ]}
+          >
+            <Text style={[styles.badgeText, { color: categoryColor }]}>
+              {challenge.category}
+            </Text>
+          </View>
+          <View style={styles.participantsBadge}>
+            <Users size={12} color={colors.textSecondary} />
+            <Text style={[styles.participantsText, { color: colors.textSecondary }]}>
+              {participants.toLocaleString()} joined
             </Text>
           </View>
         </View>
