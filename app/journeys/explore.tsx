@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
   journeyToggleContainer: {
     flexDirection: 'row',
     padding: SPACING.xs - 2,
-    borderRadius: BORDER_RADIUS.full,
+    borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
   },
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
-    borderRadius: BORDER_RADIUS.full,
+    borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
   },
   journeyToggleButtonActive: {},
