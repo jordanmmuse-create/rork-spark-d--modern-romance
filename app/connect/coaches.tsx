@@ -371,11 +371,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     gap: 6,
     flexWrap: 'nowrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   categoryPill: {
-    flex: 1,
-    paddingVertical: SPACING.sm + 2,
+    paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.sm,
     borderRadius: BORDER_RADIUS.full,
     borderWidth: 1,
@@ -386,7 +385,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   categoryPillText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: TYPOGRAPHY.weights.medium,
     flexShrink: 0,
   },
