@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
   },
   sparkCard: {
-    padding: SPACING.sm + 2,
+    padding: SPACING.md,
     borderRadius: BORDER_RADIUS.xl,
     borderWidth: 1,
     position: 'relative',
@@ -308,9 +308,9 @@ const styles = StyleSheet.create({
   },
   footerOverlay: {
     position: 'absolute',
-    left: SPACING.sm + 2,
-    right: SPACING.sm + 2,
-    bottom: SPACING.sm + 2,
+    left: SPACING.md,
+    right: SPACING.md,
+    bottom: SPACING.md,
   },
   footerSpacer: {
     flexDirection: 'row',
