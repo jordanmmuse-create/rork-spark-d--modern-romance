@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTabScroll } from './_layout';
 import { Gamepad2, Users, Play, Repeat, Target, Sparkles } from 'lucide-react-native';
 import { SEED_GAMES_TURN_BASED, SEED_GAMES_COLLABORATIVE, SEED_CHALLENGES } from '@/constants/data';
+import { getCategoryStyle } from '@/constants/categoryStyles';
 import { SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/colors';
 import { HEADER_RIGHT_OFFSET, HEADER_TOP_OFFSET } from '@/constants/header';
 import HeaderProfileButton from '@/components/HeaderProfileButton';
@@ -170,7 +171,7 @@ export default function PlayScreen() {
                   startDate: '2025-01-01',
                   endDate: '2025-01-31',
                   participants: 487,
-                  category: 'growth',
+                  category: 'play',
                   status: 'active',
                 }}
                 colors={colors}
@@ -184,7 +185,7 @@ export default function PlayScreen() {
                   startDate: '2025-01-01',
                   endDate: '2025-12-31',
                   participants: 356,
-                  category: 'play',
+                  category: 'competitive',
                   status: 'active',
                 }}
                 colors={colors}
@@ -198,7 +199,7 @@ export default function PlayScreen() {
                   startDate: '2025-01-15',
                   endDate: '2025-12-31',
                   participants: 0,
-                  category: 'communication',
+                  category: 'play',
                   status: 'upcoming',
                 }}
                 colors={colors}
@@ -212,7 +213,7 @@ export default function PlayScreen() {
                   startDate: '2025-01-01',
                   endDate: '2025-12-31',
                   participants: 1654,
-                  category: 'play',
+                  category: 'competitive',
                   status: 'active',
                 }}
                 colors={colors}
@@ -227,20 +228,6 @@ export default function PlayScreen() {
 
 function GameCard({ game, colors }: { game: Game; colors: any }) {
   const router = useRouter();
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'deep':
-        return '#A78BFA';
-      case 'romantic':
-        return '#F472B6';
-      case 'fun':
-        return '#FBBF24';
-      case 'competitive':
-        return '#F97316';
-      default:
-        return colors.accent;
-    }
-  };
 
   const getGameEmoji = (title: string) => {
     if (title.includes('L\'Inked')) return '🔗';
@@ -261,7 +248,7 @@ function GameCard({ game, colors }: { game: Game; colors: any }) {
     return '🎮';
   };
 
-  const categoryColor = getCategoryColor(game.category);
+  const categoryStyle = getCategoryStyle(game.category);
   const emoji = getGameEmoji(game.title);
 
   const handlePress = () => {
@@ -288,11 +275,11 @@ function GameCard({ game, colors }: { game: Game; colors: any }) {
           <View
             style={[
               styles.badge,
-              { backgroundColor: categoryColor + '20' },
+              { backgroundColor: categoryStyle.color + '20' },
             ]}
           >
-            <Text style={[styles.badgeText, { color: categoryColor }]}>
-              {game.category}
+            <Text style={[styles.badgeText, { color: categoryStyle.color }]}>
+              {categoryStyle.label}
             </Text>
           </View>
           <Text style={[styles.metaText, { color: colors.textSecondary }]}>{game.estTime} min</Text>
@@ -306,6 +293,7 @@ function GameCard({ game, colors }: { game: Game; colors: any }) {
 function PlayConnectCard({ challenge, colors }: { challenge: CommunityChallenge; colors: any }) {
   const router = useRouter();
   const participants = challenge.participants || 0;
+  const categoryStyle = getCategoryStyle(challenge.category);
 
   const handlePress = () => {
     console.log('[Play] Navigate to leaderboards chat');
@@ -328,12 +316,6 @@ function PlayConnectCard({ challenge, colors }: { challenge: CommunityChallenge;
         <Text style={[styles.cardTitle, { color: colors.text }]}>{challenge.title}</Text>
         <Text style={[styles.cardDescription, { color: colors.textSecondary }]}>{challenge.description}</Text>
         <View style={styles.cardMeta}>
-          <View style={styles.participantsBadge}>
-            <Users size={12} color={colors.textSecondary} />
-            <Text style={[styles.participantsText, { color: colors.textSecondary }]}>
-              {participants.toLocaleString()} joined
-            </Text>
-          </View>
           <View
             style={[
               styles.statusBadge,
@@ -359,6 +341,22 @@ function PlayConnectCard({ challenge, colors }: { challenge: CommunityChallenge;
               {challenge.status}
             </Text>
           </View>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: categoryStyle.color + '20' },
+            ]}
+          >
+            <Text style={[styles.badgeText, { color: categoryStyle.color }]}>
+              {categoryStyle.label}
+            </Text>
+          </View>
+          <View style={styles.participantsBadge}>
+            <Users size={12} color={colors.textSecondary} />
+            <Text style={[styles.participantsText, { color: colors.textSecondary }]}>
+              {participants.toLocaleString()} joined
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -367,29 +365,7 @@ function PlayConnectCard({ challenge, colors }: { challenge: CommunityChallenge;
 
 function ChallengeCard({ challenge, colors }: { challenge: CommunityChallenge; colors: any }) {
   const participants = challenge.participants || 0;
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'deep':
-        return '#A78BFA';
-      case 'romantic':
-        return '#F472B6';
-      case 'fun':
-        return '#FBBF24';
-      case 'competitive':
-        return '#F97316';
-      case 'growth':
-        return '#10B981';
-      case 'play':
-        return '#3B82F6';
-      case 'communication':
-        return '#8B5CF6';
-      default:
-        return colors.accent;
-    }
-  };
-
-  const categoryColor = getCategoryColor(challenge.category);
+  const categoryStyle = getCategoryStyle(challenge.category);
 
   return (
     <TouchableOpacity style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]} activeOpacity={0.8}>
@@ -428,11 +404,11 @@ function ChallengeCard({ challenge, colors }: { challenge: CommunityChallenge; c
           <View
             style={[
               styles.badge,
-              { backgroundColor: categoryColor + '20' },
+              { backgroundColor: categoryStyle.color + '20' },
             ]}
           >
-            <Text style={[styles.badgeText, { color: categoryColor }]}>
-              {challenge.category}
+            <Text style={[styles.badgeText, { color: categoryStyle.color }]}>
+              {categoryStyle.label}
             </Text>
           </View>
           <View style={styles.participantsBadge}>

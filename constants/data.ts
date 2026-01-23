@@ -1974,7 +1974,7 @@ export const SEED_CHALLENGES: CommunityChallenge[] = [
     startDate: '2025-12-01',
     endDate: '2025-12-25',
     participants: 2103,
-    category: 'play',
+    category: 'seasonal',
     status: 'active',
   },
   {
@@ -1985,7 +1985,7 @@ export const SEED_CHALLENGES: CommunityChallenge[] = [
     startDate: '2025-01-01',
     endDate: '2025-01-31',
     participants: 1247,
-    category: 'gratitude',
+    category: 'romantic',
     status: 'active',
   },
   {
@@ -1996,7 +1996,7 @@ export const SEED_CHALLENGES: CommunityChallenge[] = [
     startDate: '2025-01-15',
     endDate: '2025-02-15',
     participants: 892,
-    category: 'play',
+    category: 'romantic',
     status: 'active',
   },
   {
@@ -2007,7 +2007,7 @@ export const SEED_CHALLENGES: CommunityChallenge[] = [
     startDate: '2025-02-01',
     endDate: '2025-02-07',
     participants: 0,
-    category: 'communication',
+    category: 'deep',
     status: 'upcoming',
   },
 ];
