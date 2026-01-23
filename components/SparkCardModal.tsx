@@ -159,7 +159,16 @@ export default function SparkCardModal({
           >
             <FlippableSparkCard
               onFlipChange={onLogoSideChange}
-              disabledTouchAreas={<View />}
+              disabledTouchAreas={
+                <View style={styles.footerOverlay} pointerEvents="box-none" testID="spark-modal-footer">
+                  <SparkCardFooter
+                    spark={spark}
+                    isBookmarked={computedIsBookmarked}
+                    onPressBookmark={handleBookmarkPress}
+                    onPressSend={handleSendPress}
+                  />
+                </View>
+              }
             >
               <View style={[styles.sparkCard, { backgroundColor: colors.card, borderColor: colors.border }]} testID="spark-modal-card-content">
                 <LinearGradient
@@ -169,63 +178,54 @@ export default function SparkCardModal({
                   end={{ x: 1, y: 1 }}
                 />
 
-                <View style={styles.contentGrow}>
+                <View
+                  style={[
+                    styles.focusBadge,
+                    {
+                      backgroundColor: areaTagColors.background,
+                      borderColor: areaTagColors.border,
+                      borderWidth: 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.focusEmoji}>
+                    {FOCUS_AREA_INFO[spark.focusArea].emoji}
+                  </Text>
+                  <Text style={[styles.focusText, { color: areaTagColors.text }]}>
+                    {FOCUS_AREA_INFO[spark.focusArea].title}
+                  </Text>
+                </View>
+
+                <Text style={[styles.sparkTitle, { color: colors.text }]}>{spark.title}</Text>
+
+                <View style={styles.section}>
+                  <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>IDEA SPARK</Text>
+                  <Text style={[styles.lessonText, { color: colors.text }]}>{spark.lesson}</Text>
+                </View>
+
+                <View style={styles.section}>
+                  <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CONVERSATION SPARK</Text>
                   <View
                     style={[
-                      styles.focusBadge,
+                      styles.starterBox,
                       {
-                        backgroundColor: areaTagColors.background,
-                        borderColor: areaTagColors.border,
-                        borderWidth: 1,
+                        backgroundColor: colors.surfaceInset || colors.backgroundSecondary,
+                        borderLeftColor: colors.accent,
                       },
                     ]}
                   >
-                    <Text style={styles.focusEmoji}>
-                      {FOCUS_AREA_INFO[spark.focusArea].emoji}
+                    <Text style={[styles.starterText, { color: colors.text }]}>
+                      &ldquo;{spark.starter}&rdquo;
                     </Text>
-                    <Text style={[styles.focusText, { color: areaTagColors.text }]}>
-                      {FOCUS_AREA_INFO[spark.focusArea].title}
-                    </Text>
-                  </View>
-
-                  <Text style={[styles.sparkTitle, { color: colors.text }]}>{spark.title}</Text>
-
-                  <View style={styles.section}>
-                    <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>IDEA SPARK</Text>
-                    <Text style={[styles.lessonText, { color: colors.text }]}>{spark.lesson}</Text>
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CONVERSATION SPARK</Text>
-                    <View
-                      style={[
-                        styles.starterBox,
-                        {
-                          backgroundColor: colors.surfaceInset || colors.backgroundSecondary,
-                          borderLeftColor: colors.accent,
-                        },
-                      ]}
-                    >
-                      <Text style={[styles.starterText, { color: colors.text }]}>
-                        &ldquo;{spark.starter}&rdquo;
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={[styles.section, styles.actionSection]}>
-                    <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>ACTION SPARK</Text>
-                    <Text style={[styles.actionText, { color: colors.text }]}>{spark.action}</Text>
                   </View>
                 </View>
 
-                <View style={styles.footerWrap} testID="spark-modal-footer">
-                  <SparkCardFooter
-                    spark={spark}
-                    isBookmarked={computedIsBookmarked}
-                    onPressBookmark={handleBookmarkPress}
-                    onPressSend={handleSendPress}
-                  />
+                <View style={[styles.section, styles.actionSection]}>
+                  <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>ACTION SPARK</Text>
+                  <Text style={[styles.actionText, { color: colors.text }]}>{spark.action}</Text>
                 </View>
+
+                <View style={styles.footerSpacer} />
               </View>
             </FlippableSparkCard>
           </Pressable>
@@ -269,12 +269,11 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
   },
   sparkCard: {
-    padding: SPACING.sm,
+    padding: SPACING.sm + 2,
     borderRadius: BORDER_RADIUS.xl,
     borderWidth: 1,
     position: 'relative',
     overflow: 'hidden',
-    minHeight: 360,
   },
   glowOverlay: {
     position: 'absolute',
@@ -307,11 +306,17 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs + 4,
     lineHeight: 28,
   },
-  contentGrow: {
-    flex: 0,
+  footerOverlay: {
+    position: 'absolute',
+    left: SPACING.sm + 2,
+    right: SPACING.sm + 2,
+    bottom: SPACING.sm + 2,
   },
-  footerWrap: {
-    marginTop: SPACING.sm,
+  footerSpacer: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginTop: SPACING.xs,
+    height: SPACING.sm + 2 + SPACING.sm + 2 + SPACING.md,
   },
   section: {
     marginBottom: SPACING.sm,
