@@ -157,7 +157,7 @@ export default function SparksModalScreen() {
             backgroundColor: '#121214',
           },
           headerTitleContainerStyle: {
-            paddingTop: 16,
+            paddingTop: 8,
           },
           headerTitle: () => headerTitle as any,
         }}
