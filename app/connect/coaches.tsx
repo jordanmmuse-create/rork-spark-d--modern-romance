@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   categoryPill: {
     paddingVertical: SPACING.sm * 1.18,
     paddingHorizontal: SPACING.sm * 1.18,
-    borderRadius: BORDER_RADIUS.full,
+    borderRadius: BORDER_RADIUS.sm,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
