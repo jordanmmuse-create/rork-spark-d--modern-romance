@@ -2052,7 +2052,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 'auto',
-    marginRight: SPACING.sm,
+    marginRight: 4,
     gap: 4,
   },
   workshopHintText: {
