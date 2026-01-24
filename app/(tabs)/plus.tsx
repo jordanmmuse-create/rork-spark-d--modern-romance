@@ -1158,7 +1158,7 @@ function JourneyCard({ journey, isActive, progress, onStart, onInfoPress, showHi
   return (
     <View style={[styles.journeyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.journeyHeaderHorizontal}>
-        <Text style={[styles.journeyTitle, { color: colors.text, flexShrink: 1 }]}>{journey.title}</Text>
+        <Text style={[styles.journeyTitle, { color: colors.text, flex: 1 }]}>{journey.title}</Text>
         {showHint && (
           <View style={styles.workshopHintContainer}>
           <Text style={[styles.workshopHintText, { color: colors.accent }]}>TAP HERE</Text>
@@ -1560,7 +1560,6 @@ const styles = StyleSheet.create({
   journeyHeaderHorizontal: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: SPACING.xs - 2,
     gap: SPACING.sm,
   },
@@ -2051,8 +2050,7 @@ const styles = StyleSheet.create({
   workshopHintContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: SPACING.xs,
+    marginRight: 2,
     gap: 4,
   },
   workshopHintText: {
