@@ -130,7 +130,7 @@ export default function FlippableSparkCard({
                     { color: colors.textSecondary, opacity: hintOpacity }
                   ]}
                 >
-                  Tap To Reveal
+                  TAP TO REVEAL
                 </Animated.Text>
               )}
             </View>

@@ -37,7 +37,7 @@ export default function PlusScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { colors } = useThemeStyles();
-  const { getJourneys, userJourneys, startJourney, addCalendarEvent, calendarEvents, toggleEventComplete, deleteCalendarEvent, scheduleCoachingSession, syncProfileDatesToCalendar, profile, checkIns } = useAppStore();
+  const { getJourneys, userJourneys, startJourney, addCalendarEvent, calendarEvents, toggleEventComplete, deleteCalendarEvent, scheduleCoachingSession, syncProfileDatesToCalendar, profile, checkIns, hasSeenWorkshopHint, markWorkshopHintSeen } = useAppStore();
   const unreadMessagesCount = useAppStore((state) => state.conversations.reduce((total, conv) => total + conv.unreadCount, 0));
   const isNavigatingToMessagesRef = useRef<boolean>(false);
   const journeys = getJourneys();
@@ -519,10 +519,11 @@ export default function PlusScreen() {
               <Text style={[styles.featuredTitleSmall, { color: colors.text }]}>Featured Journeys…</Text>
             </View>
             
-          {filteredJourneys.map((journey) => {
+          {filteredJourneys.map((journey, index) => {
             const userJourney = userJourneys.find(
               (uj) => uj.journeyId === journey.id
             );
+            const isFirstWorkshop = selectedJourneyType === 'workshop' && index === 0 && journey.id === 'workshop-1';
             return (
               <JourneyCard
                 key={journey.id}
@@ -531,6 +532,8 @@ export default function PlusScreen() {
                 progress={userJourney ? userJourney.completedDays.length : 0}
                 onStart={() => handleStartJourney(journey.id)}
                 onInfoPress={() => setShowJourneyDetail(journey)}
+                showHint={isFirstWorkshop && !hasSeenWorkshopHint}
+                onHintDismiss={markWorkshopHintSeen}
               />
             );
           })}
@@ -1006,6 +1009,8 @@ interface JourneyCardProps {
   progress: number;
   onStart: () => void;
   onInfoPress: () => void;
+  showHint?: boolean;
+  onHintDismiss?: () => void;
 }
 
 interface CoachCardProps {
@@ -1139,14 +1144,24 @@ function SwipeableEventItem({ event, onToggleComplete, onDelete }: SwipeableEven
   );
 }
 
-function JourneyCard({ journey, isActive, progress, onStart, onInfoPress }: JourneyCardProps) {
+function JourneyCard({ journey, isActive, progress, onStart, onInfoPress, showHint, onHintDismiss }: JourneyCardProps) {
   const { colors } = useThemeStyles();
   const primaryColor = FOCUS_AREA_COLORS[journey.focusAreas[0]] || colors.tint;
+
+  const handlePress = () => {
+    if (showHint && onHintDismiss) {
+      onHintDismiss();
+    }
+    onInfoPress();
+  };
 
   return (
     <View style={[styles.journeyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.journeyHeaderHorizontal}>
-        <Text style={[styles.journeyTitle, { color: colors.text, flex: 1 }]}>{journey.title}</Text>
+        <Text style={[styles.journeyTitle, { color: colors.text, flexShrink: 1 }]}>{journey.title}</Text>
+        {showHint && (
+          <Text style={[styles.workshopHintText, { color: colors.accent }]}>TAP HERE -&gt;</Text>
+        )}
         <TouchableOpacity
           style={[
             styles.journeyIconSmall,
@@ -1156,7 +1171,7 @@ function JourneyCard({ journey, isActive, progress, onStart, onInfoPress }: Jour
             if (Platform.OS !== 'web') {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }
-            onInfoPress();
+            handlePress();
           }}
           activeOpacity={0.7}
         >
@@ -2029,6 +2044,13 @@ const styles = StyleSheet.create({
   journeyToggleTextActive: {
     color: 'white',
     fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  workshopHintText: {
+    fontSize: TYPOGRAPHY.sizes.xs,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginLeft: SPACING.xs,
+    marginRight: SPACING.xs,
+    flexShrink: 0,
   },
   exploreJourneysButton: {
     flexDirection: 'row',

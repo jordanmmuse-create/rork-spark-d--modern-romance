@@ -37,6 +37,7 @@ interface AppState {
   _lastSparkCheck: string | null;
   theme: 'light' | 'dark';
   hasSeenSparkFlipHint: boolean;
+  hasSeenWorkshopHint: boolean;
   badgeDisplayEnabled: boolean;
   sparkCardSpeechEnabled: boolean;
   parqCardSpeechEnabled: boolean;
@@ -176,6 +177,7 @@ interface AppState {
   setTheme: (theme: 'light' | 'dark') => void;
   
   markSparkFlipHintSeen: () => void;
+  markWorkshopHintSeen: () => void;
   
   softReload: () => void;
   reset: () => void;
@@ -199,6 +201,7 @@ const appStore = create<AppState>()(
       _lastSparkCheck: null,
       theme: 'dark',
       hasSeenSparkFlipHint: false,
+      hasSeenWorkshopHint: false,
       badgeDisplayEnabled: true,
       sparkCardSpeechEnabled: true,
       parqCardSpeechEnabled: true,
@@ -1640,6 +1643,8 @@ const appStore = create<AppState>()(
 
       markSparkFlipHintSeen: () => set({ hasSeenSparkFlipHint: true }),
 
+      markWorkshopHintSeen: () => set({ hasSeenWorkshopHint: true }),
+
       softReload: () => {
         console.log('[softReload] Performing soft reload - preserving all data');
         const state = get();
@@ -1885,6 +1890,7 @@ const appStore = create<AppState>()(
           _lastSparkCheck: null,
           theme: 'dark',
           hasSeenSparkFlipHint: false,
+          hasSeenWorkshopHint: false,
           badgeDisplayEnabled: true,
           sparkCardSpeechEnabled: true,
           parqCardSpeechEnabled: true,
