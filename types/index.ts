@@ -9,8 +9,7 @@ export type FocusArea =
   | 'gratitude'
   | 'growth'
   | 'boundaries'
-  | 'desire'
-  | 'intention';
+  | 'desire';
 
 export type Tone = 'playful' | 'practical' | 'poetic';
 
