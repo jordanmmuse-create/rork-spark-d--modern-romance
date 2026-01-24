@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Sparkles, Plus, Map, Calendar as CalendarIcon, MessageCircle, Link2, LockKeyhole, Play, CheckCircle2, Circle, X, ChevronLeft, ChevronRight, Wrench, Cloud, Trash2, Star, Bot, Users, User } from 'lucide-react-native';
+import { Sparkles, Plus, Map, Calendar as CalendarIcon, MessageCircle, Link2, LockKeyhole, Play, CheckCircle2, Circle, X, ChevronLeft, ChevronRight, Wrench, Cloud, Trash2, Star, Bot, Users, User, ArrowRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAppStore } from '@/store/appStore';
 import { FOCUS_AREA_INFO } from '@/constants/data';
@@ -1160,7 +1160,10 @@ function JourneyCard({ journey, isActive, progress, onStart, onInfoPress, showHi
       <View style={styles.journeyHeaderHorizontal}>
         <Text style={[styles.journeyTitle, { color: colors.text, flexShrink: 1 }]}>{journey.title}</Text>
         {showHint && (
-          <Text style={[styles.workshopHintText, { color: colors.accent }]}>TAP HERE -&gt;</Text>
+          <View style={styles.workshopHintContainer}>
+          <Text style={[styles.workshopHintText, { color: colors.accent }]}>TAP HERE</Text>
+          <ArrowRight size={12} color={colors.accent} />
+        </View>
         )}
         <TouchableOpacity
           style={[
@@ -2045,11 +2048,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
+  workshopHintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    marginRight: SPACING.sm,
+    gap: 4,
+  },
   workshopHintText: {
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: TYPOGRAPHY.weights.semibold,
-    marginLeft: SPACING.xs,
-    marginRight: SPACING.xs,
     flexShrink: 0,
   },
   exploreJourneysButton: {
