@@ -72,6 +72,7 @@ export const FOCUS_AREA_COLORS: Record<string, string> = {
   growth: '#4ADE80',
   boundaries: '#F97316',
   desire: '#EF4444',
+  intention: '#FBBF24',
 };
 
 export const THEME_TAG_COLORS: Record<string, { background: string; text: string; border: string }> = {
@@ -112,6 +113,7 @@ export const THEME_TAG_COLORS: Record<string, { background: string; text: string
   Worth: { background: '#FCE7F3', text: '#BE185D', border: '#F472B6' },
   Trust: { background: '#FFEDD5', text: '#C2410C', border: '#F97316' },
   Desire: { background: '#FFE4E6', text: '#DC2626', border: '#EF4444' },
+  Intention: { background: '#FEF3C7', text: '#B45309', border: '#FBBF24' },
 };
 
 export function getThemeTagColor(tag: string): { background: string; text: string; border: string } {

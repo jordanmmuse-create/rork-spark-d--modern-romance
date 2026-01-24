@@ -20,7 +20,7 @@ import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { Spark, FocusArea, RelationshipStage } from '@/types';
 
 
-type CategoryId = 'all' | 'communication' | 'trust' | 'conflict' | 'play' | 'growth' | 'gratitude' | 'intimacy' | 'boundaries' | 'desire';
+type CategoryId = 'all' | 'communication' | 'trust' | 'conflict' | 'play' | 'growth' | 'gratitude' | 'intimacy' | 'boundaries' | 'desire' | 'intention';
 
 const CATEGORIES: { id: CategoryId; label: string; value: FocusArea | 'all' }[] = [
   { id: 'all', label: 'All', value: 'all' },
@@ -33,6 +33,7 @@ const CATEGORIES: { id: CategoryId; label: string; value: FocusArea | 'all' }[] 
   { id: 'intimacy', label: 'Intimacy', value: 'intimacy' },
   { id: 'boundaries', label: 'Boundaries', value: 'boundaries' },
   { id: 'desire', label: 'Desire', value: 'desire' },
+  { id: 'intention', label: 'Intention', value: 'intention' },
 ];
 
 function toggleCategory(
