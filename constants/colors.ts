@@ -72,6 +72,7 @@ export const FOCUS_AREA_COLORS: Record<string, string> = {
   growth: '#4ADE80',
   boundaries: '#F97316',
   desire: '#EF4444',
+  intention: '#FBBF24',
 };
 
 export const THEME_TAG_COLORS: Record<string, { background: string; text: string; border: string }> = {
