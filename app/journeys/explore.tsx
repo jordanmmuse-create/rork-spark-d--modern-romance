@@ -19,18 +19,20 @@ import { SPACING, BORDER_RADIUS, TYPOGRAPHY, FOCUS_AREA_COLORS } from '@/constan
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { Journey, FocusArea } from '@/types';
 
-type CategoryId = 'all' | 'communication' | 'trust' | 'conflict' | 'play' | 'growth' | 'gratitude' | 'intimacy' | 'boundaries';
+type CategoryId = 'all' | 'communication' | 'growth' | 'intimacy' | 'trust' | 'intention' | 'conflict' | 'gratitude' | 'desire' | 'boundaries' | 'play';
 
 const CATEGORIES: { id: CategoryId; label: string; value: FocusArea | 'all' }[] = [
   { id: 'all', label: 'All', value: 'all' },
   { id: 'communication', label: 'Communication', value: 'communication' },
-  { id: 'trust', label: 'Trust', value: 'trust' },
-  { id: 'conflict', label: 'Conflict', value: 'conflict' },
-  { id: 'play', label: 'Play', value: 'play' },
   { id: 'growth', label: 'Growth', value: 'growth' },
-  { id: 'gratitude', label: 'Gratitude', value: 'gratitude' },
   { id: 'intimacy', label: 'Intimacy', value: 'intimacy' },
+  { id: 'trust', label: 'Trust', value: 'trust' },
+  { id: 'intention', label: 'Intention', value: 'intention' },
+  { id: 'conflict', label: 'Conflict', value: 'conflict' },
+  { id: 'gratitude', label: 'Gratitude', value: 'gratitude' },
+  { id: 'desire', label: 'Desire', value: 'desire' },
   { id: 'boundaries', label: 'Boundaries', value: 'boundaries' },
+  { id: 'play', label: 'Play', value: 'play' },
 ];
 
 function toggleCategory(
@@ -55,13 +57,15 @@ function getCategoryColor(categoryId: string): string {
   const colorMap: Record<string, string> = {
     all: '#F97316',
     communication: '#60A5FA',
-    trust: '#A78BFA',
-    conflict: '#F97316',
-    play: '#FBBF24',
     growth: '#4ADE80',
-    gratitude: '#34D399',
     intimacy: '#F472B6',
-    boundaries: '#C084FC',
+    trust: '#F97316',
+    intention: '#FBBF24',
+    conflict: '#60A5FA',
+    gratitude: '#4ADE80',
+    desire: '#F472B6',
+    boundaries: '#F97316',
+    play: '#FBBF24',
   };
   return colorMap[categoryId] || '#F97316';
 }
