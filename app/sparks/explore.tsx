@@ -25,15 +25,15 @@ type CategoryId = 'all' | 'communication' | 'trust' | 'conflict' | 'play' | 'gro
 const CATEGORIES: { id: CategoryId; label: string; value: FocusArea | 'all' }[] = [
   { id: 'all', label: 'All', value: 'all' },
   { id: 'communication', label: 'Communication', value: 'communication' },
-  { id: 'trust', label: 'Trust', value: 'trust' },
-  { id: 'conflict', label: 'Conflict', value: 'conflict' },
-  { id: 'play', label: 'Play', value: 'play' },
   { id: 'growth', label: 'Growth', value: 'growth' },
-  { id: 'gratitude', label: 'Gratitude', value: 'gratitude' },
   { id: 'intimacy', label: 'Intimacy', value: 'intimacy' },
-  { id: 'boundaries', label: 'Boundaries', value: 'boundaries' },
-  { id: 'desire', label: 'Desire', value: 'desire' },
+  { id: 'trust', label: 'Trust', value: 'trust' },
   { id: 'intention', label: 'Intention', value: 'intention' },
+  { id: 'conflict', label: 'Conflict', value: 'conflict' },
+  { id: 'gratitude', label: 'Gratitude', value: 'gratitude' },
+  { id: 'desire', label: 'Desire', value: 'desire' },
+  { id: 'boundaries', label: 'Boundaries', value: 'boundaries' },
+  { id: 'play', label: 'Play', value: 'play' },
 ];
 
 function toggleCategory(
