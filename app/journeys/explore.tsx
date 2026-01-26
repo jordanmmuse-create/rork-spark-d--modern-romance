@@ -81,6 +81,7 @@ export default function ExploreJourneysScreen() {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<CategoryId[]>(['all']);
   const [selectedJourneyType, setSelectedJourneyType] = useState<'devotional' | 'workshop'>('workshop');
   const [isFilterModalVisible, setIsFilterModalVisible] = useState<boolean>(false);
+  const [showJourneyDetail, setShowJourneyDetail] = useState<Journey | null>(null);
   
   const hasActiveFilters = selectedCategoryIds.length > 0 && !selectedCategoryIds.includes('all');
   
@@ -302,6 +303,7 @@ export default function ExploreJourneysScreen() {
                 isActive={userJourney?.status === 'active'}
                 progress={userJourney ? userJourney.completedDays.length : 0}
                 onStart={() => handleStartJourney(journey.id)}
+                onInfoPress={() => setShowJourneyDetail(journey)}
               />
             );
           })
@@ -321,6 +323,82 @@ export default function ExploreJourneysScreen() {
         }}
         onReset={resetFilters}
       />
+
+      <Modal
+        visible={showJourneyDetail !== null}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setShowJourneyDetail(null)}
+      >
+        <View style={styles.journeyModalOverlay}>
+          <View style={[styles.journeyModalContent, { backgroundColor: colors.card }]}>
+            {showJourneyDetail && (
+              <>
+                <TouchableOpacity
+                  style={[styles.journeyModalClose, { backgroundColor: colors.backgroundSecondary }]}
+                  onPress={() => setShowJourneyDetail(null)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.journeyModalCloseText, { color: colors.text }]}>✕</Text>
+                </TouchableOpacity>
+                
+                <View style={[styles.journeyModalTypeBadge, { backgroundColor: (showJourneyDetail.journeyType === 'workshop' ? '#007AFF' : '#8B5CF6') + '20' }]}>
+                  <Text style={[styles.journeyModalTypeText, { color: showJourneyDetail.journeyType === 'workshop' ? '#007AFF' : '#8B5CF6' }]}>
+                    {showJourneyDetail.journeyType === 'workshop' ? 'WORKSHOP' : 'DEVOTIONAL'}
+                  </Text>
+                </View>
+                
+                <Text style={[styles.journeyModalTitle, { color: colors.text }]}>{showJourneyDetail.title}</Text>
+                
+                <Text style={[styles.journeyModalDescription, { color: colors.text }]}>
+                  {showJourneyDetail.overview}
+                </Text>
+                
+                <View style={styles.journeyModalMeta}>
+                  <View style={styles.journeyModalFocusAreas}>
+                    {showJourneyDetail.focusAreas.map((area) => (
+                      <View
+                        key={area}
+                        style={[
+                          styles.journeyModalAreaTag,
+                          { backgroundColor: FOCUS_AREA_COLORS[area] + '20' },
+                        ]}
+                      >
+                        <Text style={styles.journeyModalAreaEmoji}>
+                          {FOCUS_AREA_INFO[area].emoji}
+                        </Text>
+                        <Text style={[styles.journeyModalAreaText, { color: FOCUS_AREA_COLORS[area] }]}>
+                          {FOCUS_AREA_INFO[area].title}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                  
+                  <View style={[styles.journeyModalDuration, { backgroundColor: colors.backgroundSecondary }]}>
+                    <Text style={[styles.journeyModalDurationText, { color: colors.text }]}>
+                      {showJourneyDetail.journeyType === 'devotional' 
+                        ? `${showJourneyDetail.durationDays || showJourneyDetail.days} days`
+                        : `${showJourneyDetail.durationMinutes || 0} minutes`}
+                    </Text>
+                  </View>
+                </View>
+                
+                <TouchableOpacity
+                  style={[styles.journeyModalStartButton, { backgroundColor: colors.tint }]}
+                  onPress={() => {
+                    handleStartJourney(showJourneyDetail.id);
+                    setShowJourneyDetail(null);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Play size={18} color="white" />
+                  <Text style={styles.journeyModalStartText}>Start Journey</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -442,9 +520,10 @@ interface JourneyCardProps {
   isActive: boolean;
   progress: number;
   onStart: () => void;
+  onInfoPress: () => void;
 }
 
-function JourneyCard({ journey, isActive, progress, onStart }: JourneyCardProps) {
+function JourneyCard({ journey, isActive, progress, onStart, onInfoPress }: JourneyCardProps) {
   const { colors } = useThemeStyles();
   const primaryColor = FOCUS_AREA_COLORS[journey.focusAreas[0]] || colors.tint;
 
@@ -452,21 +531,28 @@ function JourneyCard({ journey, isActive, progress, onStart }: JourneyCardProps)
     <View style={[styles.journeyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
       <View style={styles.journeyHeaderHorizontal}>
         <Text style={[styles.journeyTitle, { color: colors.text, flex: 1 }]}>{journey.title}</Text>
-        <View
+        <TouchableOpacity
           style={[
             styles.journeyIconSmall,
             { backgroundColor: primaryColor + '20' },
           ]}
+          onPress={() => {
+            if (Platform.OS !== 'web') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
+            onInfoPress();
+          }}
+          activeOpacity={0.7}
         >
           <Map size={16} color={primaryColor} />
-        </View>
+        </TouchableOpacity>
       </View>
       {isActive && (
         <View style={[styles.activeTag, { backgroundColor: primaryColor }]}>
           <Text style={styles.activeTagText}>Active</Text>
         </View>
       )}
-      <Text style={[styles.journeyOverview, { color: colors.textSecondary }]} numberOfLines={2}>
+      <Text style={[styles.journeyOverview, { color: colors.textSecondary }]} numberOfLines={1}>
         {journey.overview}
       </Text>
 
@@ -883,5 +969,104 @@ const styles = StyleSheet.create({
   },
   modalButtonTextPrimary: {
     color: '#FFFFFF',
+  },
+  journeyModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.lg,
+  },
+  journeyModalContent: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.xl,
+    position: 'relative',
+  },
+  journeyModalClose: {
+    position: 'absolute',
+    top: SPACING.md,
+    right: SPACING.md,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  journeyModalCloseText: {
+    fontSize: 20,
+    fontWeight: TYPOGRAPHY.weights.medium,
+  },
+  journeyModalTypeBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs - 2,
+    borderRadius: BORDER_RADIUS.sm,
+    marginBottom: SPACING.sm,
+  },
+  journeyModalTypeText: {
+    fontSize: TYPOGRAPHY.sizes.xs,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    letterSpacing: 0.5,
+  },
+  journeyModalTitle: {
+    fontSize: TYPOGRAPHY.sizes.xl,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    marginBottom: SPACING.md,
+    paddingRight: SPACING.xl,
+  },
+  journeyModalDescription: {
+    fontSize: TYPOGRAPHY.sizes.md,
+    lineHeight: 24,
+    marginBottom: SPACING.lg,
+  },
+  journeyModalMeta: {
+    marginBottom: SPACING.lg,
+  },
+  journeyModalFocusAreas: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.xs,
+    marginBottom: SPACING.md,
+  },
+  journeyModalAreaTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.xs - 2,
+  },
+  journeyModalAreaEmoji: {
+    fontSize: 12,
+  },
+  journeyModalAreaText: {
+    fontSize: TYPOGRAPHY.sizes.xs,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  journeyModalDuration: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+  },
+  journeyModalDurationText: {
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.medium,
+  },
+  journeyModalStartButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    gap: SPACING.xs,
+  },
+  journeyModalStartText: {
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    color: 'white',
   },
 });
